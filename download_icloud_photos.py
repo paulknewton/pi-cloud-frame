@@ -7,6 +7,8 @@ from PIL import Image
 import io
 
 logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 
 def connect(user, password):
@@ -36,11 +38,11 @@ def connect(user, password):
 
 
 def is_eligible(photo):
-    print(photo.filename, end=" ")
+    logger.debug(photo.filename)
 
     root, ext = os.path.splitext(photo.filename)
     if (ext.upper() not in [".JPG", ".HEIC", ".PNG", ".TIF", ".GIF"]):
-        print("[Invalid format - skip]", ext)
+        logger.debug("[Invalid format %s - skip]" % ext)
         return False
 
     orientation = photo._asset_record["fields"]["orientation"]["value"]
@@ -52,10 +54,10 @@ def is_eligible(photo):
         height = photo.dimensions[0]
 
     if width <= height:
-        print("Invalid orientation - skip")
+        logger.debug("[Invalid orientation - skip]")
         return False
 
-    print("[OK]")
+    logger.debug("[OK]")
     return True
 
 
@@ -85,9 +87,9 @@ def crop_image(image):
     image.show()
 
 
-def download(photos):
+def download(photos, folder):
     for photo in photos:
-        with open(os.path.join('raw', photo.filename), 'wb') as opened_file:
+        with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
             print("[%s %s %s]" % (
                 photo.filename, photo.dimensions, photo._asset_record["fields"]["orientation"]["value"]))
             data = photo.download().raw.read()
@@ -110,6 +112,7 @@ if __name__ == '__main__':
     parser.add_argument("user", help="icloud user")
     parser.add_argument("password", help="password")
     parser.add_argument("folder", help="folder to store downloaded photos")
+    parser.add_argument("sample", help="number of photos to download", type=int)
     args = parser.parse_args()
     print(args)
 
@@ -120,12 +123,12 @@ if __name__ == '__main__':
     #    print(album)
 
     # get all photos in the photoframe album
-    print("Downloading  photo list...")
+    print("Downloading photo list...")
     photos = get_all_photos(api, "photoframe")
 
     # get a random sample to download
-    n = 10
-    print("Selecting random sample (%d from %d)" % (n, len(photos)))
-    photos = get_sample(photos, n)
+    print("Selecting random sample (%d from %d)" % (args.sample, len(photos)))
+    photos = get_sample(photos, args.sample)
 
-    download(photos)
+    print("Downloading photos to %s..." % args.folder)
+    download(photos, args.folder)
