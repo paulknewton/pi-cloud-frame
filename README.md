@@ -9,8 +9,8 @@ Like most people, I have a digitial photo frame at home. In my case, a beautiful
 
 I am really happy with this frame. The display quality is excellent and for the most part, I haven't had any issues with it.
 
-But there were 2 things that I really miss:
-* no icloud support - all of my photos are stored in the icloud, but the only way to sync photos to Nixplay is to copy them to some other supported platform like Dropbox
+But there were a few things that I really missed:
+* no icloud support - all of my photos are stored in the Apple icloud, but the only way to sync photos to Nixplay is to copy them to some other supported platform like Dropbox
 
 * no auto-cropping - the frame uses 16:9 aspect ratio while most of my photos are 3:2. I have to manually crop these to get them to fit the frame
 
@@ -18,7 +18,7 @@ But there were 2 things that I really miss:
 
 This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required.
 
-Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box.
+Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box really.
 
 ## Install
 
