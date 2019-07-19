@@ -23,22 +23,22 @@ Everything runs on a Raspberry Pi attached to one of the official displays. But 
 
 ## Install
 
-The main code to download photos is written in python, using the pyicloud library.
+The main code to download photos is written in python, using the pyicloud library. Install everything via pip. If you are not using virtualenv then you will probably need to run this as super-user via "sudo":
 
 ```
-todo
+pip install -r requirements.txt
 ```
 
 The cropping is done using the imagemagick libraries (I tried to do this using in python with PIL/Pillow, but these do not have support for the .HEIC image format).
 
 ```
-todo
+sudo apt install imagemagick
 ```
 
-And finally, the photo display is done using feb. You could use your favourite image viewer/screensaver here.
+And finally, the photos are shown on the screen using the "fbi" image viewer. You could use your favourite image viewer/screensaver here.
 
 ```
-todo
+sudo apt install fbi
 ```
 
 
@@ -48,19 +48,46 @@ The code has 2 parts: downloading the photos and displaying the photos
 
 ### Downloading the photos
 
-Just run the python code, along with the user/pwd icloud details and the number of photos to download.
-
-
-```
-todo
-```
-
-Run this via a cron job on a periodic basis so that photos get refreshed.
-
+Just run the python code, along with the user/pwd icloud details. The program uses default values for everything else.
 
 ```
-todo
+python3 myuser mypwd
 ```
+
+The program supports different command line arguments that you can use:
+```
+usage: icloud_photos.py [-h] [--output OUTPUT] [--sample SAMPLE]
+                        [--album ALBUM] [--orientation {portrait,landscape}]
+                        user password
+
+icloud photo frame
+
+positional arguments:
+  user                  icloud user
+  password              password
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --output OUTPUT       folder to store downloaded photos
+  --sample SAMPLE       number of photos to download
+  --album ALBUM         icloud album to find photos
+  --orientation {portrait,landscape}
+                        orientation of photos
+```
+
+Once you are happy with the parameters that you need, just run this via a cron job on a periodic basis so that photos get refreshed.
+
+```
+crontab -e
+```
+
+then add a line like this:
+
+```
+0 0 * * * /usr/bin/python3 /home/pi/pi-cloud-frame/icloud_photos.py myuser mypwd --sample 100 --album myphotos --orientation portrait
+```
+
+to kick-off the script each day at midnight.
 
 ### Displaying the photos
 
