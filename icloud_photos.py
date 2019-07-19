@@ -3,8 +3,8 @@ from pyicloud import PyiCloudService
 import logging
 import random
 import os
-from PIL import Image
-import io
+#from PIL import Image
+import sys
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
@@ -37,23 +37,34 @@ def connect(user, password):
     return api
 
 
-def is_eligible(photo):
+def is_image(photo):
     logger.debug(photo.filename)
 
-    root, ext = os.path.splitext(photo.filename)
-    if (ext.upper() not in [".JPG", ".HEIC", ".PNG", ".TIF", ".GIF"]):
-        logger.debug("[Invalid format %s - skip]" % ext)
+    #root, ext = os.path.splitext(photo.filename)
+    #format = ext.upper()
+    format = photo._master_record["fields"]["itemType"]["value"]
+
+    if (format not in ["public.jpeg", "public.png", "public.heic", "public.tiff"]):
+        logger.debug("[Invalid format %s - skip]" % format)
         return False
 
-    orientation = photo._asset_record["fields"]["orientation"]["value"]
+    logger.debug("[OK]")
+    return True
+    return photo._asset_record["imageType"] == "image"
+
+
+def is_correct_format(photo, orientation):
+    logger.debug(photo.filename)
+
+    photo_orientation = photo._asset_record["fields"]["orientation"]["value"]
     width, height = photo.dimensions
 
     # rotate dimensions if needed
-    if orientation == 6 or orientation == 8:
+    if photo_orientation == 6 or photo_orientation == 8:
         width = photo.dimensions[1]
         height = photo.dimensions[0]
 
-    if width <= height:
+    if (orientation == "landscape" and width <= height) or (orientation == "portrait" and width >= height):
         logger.debug("[Invalid orientation - skip]")
         return False
 
@@ -61,12 +72,15 @@ def is_eligible(photo):
     return True
 
 
-def get_all_photos(api, album):
+def get_all_photos(api, album, orientation):
     eligible_photos = []
+    #asset_types = set()
     for photo in api.photos.albums[album]:
-        if (is_eligible(photo)):
+        #asset_types.add(photo._master_record["fields"]["itemType"]["value"])
+        if (is_image(photo) and is_correct_format(photo, orientation)):
             eligible_photos.append(photo)
 
+    #print(asset_types)
     return eligible_photos
 
 
@@ -111,9 +125,11 @@ if __name__ == '__main__':
         description="icloud photo frame")
     parser.add_argument("user", help="icloud user")
     parser.add_argument("password", help="password")
-    parser.add_argument("folder", help="folder to store downloaded photos")
-    parser.add_argument("sample", help="number of photos to download", type=int)
-    parser.add_argument("--orientati")
+    parser.add_argument("--output", help="folder to store downloaded photos", default="raw")
+    parser.add_argument("--sample", help="number of photos to download", type=int, default=5)
+    parser.add_argument("--album", help="icloud album to find photos", default="All Photos")
+    parser.add_argument("--orientation", help="orientation of photos", choices=["portrait", "landscape"],
+                        default="landscape")
     args = parser.parse_args()
     print(args)
 
@@ -125,11 +141,11 @@ if __name__ == '__main__':
 
     # get all photos in the photoframe album
     print("Downloading photo list...")
-    photos = get_all_photos(api, "photoframe")
+    photos = get_all_photos(api, args.album, args.orientation)
 
     # get a random sample to download
     print("Selecting random sample (%d from %d)" % (args.sample, len(photos)))
     photos = get_sample(photos, args.sample)
 
-    print("Downloading photos to %s..." % args.folder)
+    print("Downloading photos to %s..." % args.output)
     download(photos, args.folder)
