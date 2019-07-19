@@ -113,6 +113,7 @@ if __name__ == '__main__':
     parser.add_argument("password", help="password")
     parser.add_argument("folder", help="folder to store downloaded photos")
     parser.add_argument("sample", help="number of photos to download", type=int)
+    parser.add_argument("--orientati")
     args = parser.parse_args()
     print(args)
 

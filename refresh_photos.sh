@@ -11,7 +11,7 @@ SAMPLE_SIZE=$3		# number of photos to download
 rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
-python3 download_icloud_photos.py "$1" "$2" "$DOWNLOAD" $SAMPLE_SIZE
+python3 icloud_photos.py "$1" "$2" "$DOWNLOAD" $SAMPLE_SIZE
 
 # empty the current set of cropped images (currently in use)
 rm -f "$CROPPED"/*
