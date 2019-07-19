@@ -1,4 +1,5 @@
-# icloud Photo Frame
+[![Build Status](https://travis-ci.org/paulknewton/pi-cloud-frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi-cloud-frame)
+# pi cloud frame
 
 An icloud-powered digital frame.
 Downloads a random sample of photos from your icloud account and displays them. Photos are periodically refreshed.
