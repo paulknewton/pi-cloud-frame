@@ -159,7 +159,7 @@ def get_sample(photos, n):
 
 
 if __name__ == '__main__':
-    
+
     # read command-line args
     parser = argparse.ArgumentParser(
         description="icloud photo frame")
@@ -188,4 +188,4 @@ if __name__ == '__main__':
     photos = get_sample(photos, args.sample)
 
     print("Downloading photos to %s..." % args.output)
-    download(photos, args.folder)
+    download(photos, args.output)
