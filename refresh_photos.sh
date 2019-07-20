@@ -20,8 +20,5 @@ rm -f "$CROPPED"/*
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
-for i in "../$DOWNLOAD"/*; do echo `basename $i`; /home/pi/pi-cloud-frame/aspectcrop -a 800:480 "$i" `basename $i`; done
+for i in "../$DOWNLOAD"/*; do echo `basename $i`; aspectcrop -a 800:480 "$i" `basename $i`; done
 cd ..
-
-# tidy up the raw photos
-rm -f "$DOWNLOAD"/*
