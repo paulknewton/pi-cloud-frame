@@ -3,7 +3,7 @@ from pyicloud import PyiCloudService
 import logging
 import random
 import os
-#from PIL import Image
+# from PIL import Image
 import sys
 
 logging.basicConfig(level=logging.ERROR)
@@ -51,15 +51,15 @@ def is_image(photo):
     @:return: True if the photo is an image, otherwise False
     """
 
-    #root, ext = os.path.splitext(photo.filename)
-    #format = ext.upper()
+    # root, ext = os.path.splitext(photo.filename)
+    # format = ext.upper()
     format = photo._master_record["fields"]["itemType"]["value"]
 
     if (format not in ["public.jpeg", "public.png", "public.heic", "public.tiff"]):
         logger.debug("[Invalid format %s - skip]" % format)
         return False
 
-    logger.debug("[OK]")
+    logger.debug("[format OK]")
     return True
     return photo._asset_record["imageType"] == "image"
 
@@ -85,7 +85,7 @@ def is_correct_format(photo, orientation):
         logger.debug("[Invalid orientation - skip]")
         return False
 
-    logger.debug("[OK]")
+    logger.debug("[orientation OK]")
     return True
 
 
@@ -98,16 +98,16 @@ def get_all_photos(api, album, orientation):
     @:return: a list of matching photos
     """
     eligible_photos = []
-    #asset_types = set()
+    # asset_types = set()
     i = 1
     for photo in api.photos.albums[album]:
         logger.debug("%d - Checking %s" % (i, photo.filename))
         i += 1
-        #asset_types.add(photo._master_record["fields"]["itemType"]["value"])
+        # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
         if (is_image(photo) and is_correct_format(photo, orientation)):
             eligible_photos.append(photo)
 
-    #print(asset_types)
+    # print(asset_types)
     return eligible_photos
 
 
@@ -137,7 +137,7 @@ def download(photos, folder):
     """
     for photo in photos:
         with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
-            print("[%s %s %s]" % (
+            logger.info("[%s %s %s]" % (
                 photo.filename, photo.dimensions, photo._asset_record["fields"]["orientation"]["value"]))
             data = photo.download().raw.read()
 
