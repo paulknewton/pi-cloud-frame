@@ -101,7 +101,10 @@ def get_all_photos(api, album, orientation):
     """
     eligible_photos = []
     #asset_types = set()
+    i = 1
     for photo in api.photos.albums[album]:
+        print("%d - Checking %s" % (i, photo.filename))
+        i += 1
         #asset_types.add(photo._master_record["fields"]["itemType"]["value"])
         if (is_image(photo) and is_correct_format(photo, orientation)):
             eligible_photos.append(photo)
@@ -170,14 +173,17 @@ if __name__ == '__main__':
     parser.add_argument("--album", help="icloud album to find photos", default="All Photos")
     parser.add_argument("--orientation", help="orientation of photos", choices=["portrait", "landscape"],
                         default="landscape")
+    parser.add_argument("--list", help="list albums (no photo downloading)", action='store_true', default=False)
     args = parser.parse_args()
     print(args)
 
     api = connect(args.user, args.password)
 
-    # print("Albums:")
-    # for album in api.photos.albums:
-    #    print(album)
+    if args.list:
+        print("Albums:")
+        for album in api.photos.albums:
+            print(album)
+        sys.exit(1)
 
     # get all photos in the photoframe album
     print("Downloading photo list...")
