@@ -50,7 +50,6 @@ def is_image(photo):
     @:param photo: the photo
     @:return: True if the photo is an image, otherwise False
     """
-    logger.debug(photo.filename)
 
     #root, ext = os.path.splitext(photo.filename)
     #format = ext.upper()
@@ -73,7 +72,6 @@ def is_correct_format(photo, orientation):
     :param orientation: portrait or landscape
     :return: True if the photo orientation matches the specified orientation
     """
-    logger.debug(photo.filename)
 
     photo_orientation = photo._asset_record["fields"]["orientation"]["value"]
     width, height = photo.dimensions
