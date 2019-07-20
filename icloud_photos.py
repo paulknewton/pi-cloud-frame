@@ -8,7 +8,7 @@ import sys
 
 logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.ERROR)
+logger.setLevel(logging.DEBUG)
 
 
 def connect(user, password):
@@ -103,7 +103,7 @@ def get_all_photos(api, album, orientation):
     #asset_types = set()
     i = 1
     for photo in api.photos.albums[album]:
-        print("%d - Checking %s" % (i, photo.filename))
+        logger.debug("%d - Checking %s" % (i, photo.filename))
         i += 1
         #asset_types.add(photo._master_record["fields"]["itemType"]["value"])
         if (is_image(photo) and is_correct_format(photo, orientation)):
