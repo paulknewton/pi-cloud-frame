@@ -61,7 +61,6 @@ def is_image(photo):
 
     logger.debug("[format OK]")
     return True
-    return photo._asset_record["imageType"] == "image"
 
 
 def is_correct_format(photo, orientation):
