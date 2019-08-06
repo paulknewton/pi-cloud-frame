@@ -3,7 +3,6 @@ from pyicloud import PyiCloudService
 import logging
 import random
 import os
-# from PIL import Image
 import sys
 
 logging.basicConfig(level=logging.ERROR)
@@ -76,7 +75,7 @@ def is_correct_format(photo, orientation):
     width, height = photo.dimensions
 
     # rotate dimensions if needed
-    if photo_orientation == 6 or photo_orientation == 8:
+    if photo_orientation in (6, 8):
         width = photo.dimensions[1]
         height = photo.dimensions[0]
 
