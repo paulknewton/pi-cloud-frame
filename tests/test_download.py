@@ -1,7 +1,5 @@
 import pytest
 import icloud_photos as ip
-from datetime import datetime
-import mock
 
 
 @pytest.fixture
