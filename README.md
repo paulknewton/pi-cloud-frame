@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/paulknewton/pi-cloud-frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi-cloud-frame)
+
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi-cloud-frame/?ref=repository-badge)
 # pi cloud frame
 
 An icloud-powered digital frame running on a Raspberry Pi.
