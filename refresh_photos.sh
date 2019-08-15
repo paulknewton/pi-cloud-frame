@@ -10,9 +10,9 @@ if [ $# -ne 3 ]; then
 fi
 
 MEDIA_FOLDER=media
-DOWNLOAD=$MEDIA/raw		# folder to store raw downloaded photos
-CROPPED=MEDIA/cropped		# folder to store re-cropped photos (with correct aspect ratio)
-OUT=$MEDIA/photos
+DOWNLOAD=$MEDIA_FOLDER/raw		# folder to store raw downloaded photos
+CROPPED=$MEDIA_FOLDER/cropped		# folder to store re-cropped photos (with correct aspect ratio)
+OUT=$MEDIA_FOLDER/photos
 SAMPLE_SIZE=$3		# number of photos to download
 ALBUM=photoframe
 
