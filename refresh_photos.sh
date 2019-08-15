@@ -9,11 +9,14 @@ if [ $# -ne 3 ]; then
   exit 1
 fi
 
-DOWNLOAD=raw		# folder to store raw downloaded photos
-CROPPED=cropped		# folder to store re-cropped photos (with correct aspect ratio)
-OUT=photos
+MEDIA_FOLDER=media
+DOWNLOAD=$MEDIA/raw		# folder to store raw downloaded photos
+CROPPED=MEDIA/cropped		# folder to store re-cropped photos (with correct aspect ratio)
+OUT=$MEDIA/photos
 SAMPLE_SIZE=$3		# number of photos to download
 ALBUM=photoframe
+
+ROOT=`pwd`
 
 # empty the current set of raw images (normally already done)
 rm -f "$DOWNLOAD"/*
@@ -28,10 +31,10 @@ rm -f "$CROPPED"/*
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
-for i in "../$DOWNLOAD"/*; do echo `basename $i`; aspectcrop -a 800:480 "$i" `basename $i`; done
-cd ..
+for i in "$ROOT/$DOWNLOAD"/*; do echo `basename "$i"`; aspectcrop -a 800:480 "$i" `basename "$i"`; done
+cd "$ROOT" 
 
-# empty the raw photos
+# clean out the raw photos
 rm -f "$DOWNLOAD"/*
 
 # empty the current set of final images (currently in use)
@@ -40,9 +43,9 @@ rm -f "$OUT"/*
 # convert the new photos
 echo "Converting photos from $CROPPED to $OUT..."
 cd "$OUT"
-#for i in "../$CROPPED"/*; do echo `basename $i`; convert "$i" `basename $i`; done
-for i in "../$CROPPED"/*; do echo `basename $i`; mv "$i" .; done
-cd ..
+for i in "$ROOT/$CROPPED"/*; do echo `basename "$i"`; convert "$i" `basename "$i"`.jpg; done
+#for i in "$ROOT/$CROPPED"/*; do echo `basename $i`; mv "$i" .; done
+cd $ROOT
 
 # empty the current set of cropped images
 rm -f "$CROPPED"/*
