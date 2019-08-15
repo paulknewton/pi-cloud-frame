@@ -1,11 +1,11 @@
 import argparse
 import logging
 import sys
-
+import photo_utils
 from icloud_photos import IcloudPhotos
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def main():
@@ -40,7 +40,7 @@ def main():
 
     # get a random sample to download
     logger.info("Selecting random sample (%d from %d)", args.sample, len(photos))
-    photos_sample = photos.get_sample(photos, args.sample)
+    photos_sample = photo_utils.get_sample(photos, args.sample)
 
     logger.info("Downloading photos to %s...", args.output)
     IcloudPhotos.download(photos_sample, args.output)

@@ -5,7 +5,7 @@ import sys
 from pyicloud import PyiCloudService
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class IcloudPhotos:
@@ -24,7 +24,7 @@ class IcloudPhotos:
         """
         api = PyiCloudService(user, password)
 
-        if api.requires_2sa:
+        if api.requires_2sa:    # this attribute is added by the patched pyicloud at https://github.com/picklepete/pyicloud.git
             import click
             print("Two-step authentication required. Your trusted devices are:")
 

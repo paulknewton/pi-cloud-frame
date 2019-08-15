@@ -1,4 +1,4 @@
-import photos as ip
+import photo_utils as ip
 
 
 def test_sample():
