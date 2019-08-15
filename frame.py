@@ -11,6 +11,9 @@ logging.basicConfig(level=logging.DEBUG)
 # delay between slide transitions (ms)
 SLIDESHOW_DELAY = 30000
 
+# location of all media
+MEDIA_FOLDER = "media"
+
 
 class AbstractMediaPlayer(ABC):
     """
@@ -48,7 +51,7 @@ class AbstractMediaPlayer(ABC):
         :return: a list of filenames
         """
         logger.debug("Refreshing media list for %s in folder %s", self.get_name(), self.get_folder())
-        self._media_list = glob.glob(self.get_folder() + "/*")
+        self._media_list = glob.glob(MEDIA_FOLDER + "/" + self.get_folder() + "/*")
 
         # leave index unchanged if possible (to allow playlist to be refreshed without side-effect of jumping to start
         if not self._current_media_index or self._current_media_index >= len(self._media_list):
@@ -184,7 +187,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         :return: a list of AbstractMediaPlayer instances
         """
-        players = [PhotoPlayer("Photo Player", "photos"), PhotoPlayer("Photo Player 2", "photos2"),
+        players = [PhotoPlayer("Photo Player", "photos"), PhotoPlayer("Fritz Monitor", "fritz-monitor"),
                    VideoPlayer("Video Player", "video")]
         logger.info("Initialising players: %s", players)
         return players
