@@ -22,7 +22,7 @@ def test_sample_no_data():
     Test sample where no data
     """
     photos = []
-    assert len(ip.get_sample(photos, 3)) == 0
+    assert not ip.get_sample(photos, 3)
 
 
 def test_sample_negative():
@@ -30,4 +30,4 @@ def test_sample_negative():
     Test sample where requested sample size is -ve
     """
     photos = [0] * 5
-    assert len(ip.get_sample(photos, -3)) == 0
+    assert not ip.get_sample(photos, -3)

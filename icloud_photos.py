@@ -17,8 +17,9 @@ class IcloudPhotos:
         """
         Connect to the icloud
 
-        @:param user: the icloud user id
-        @:param password: the icloud password
+        :param user: the icloud user id
+        :param password: the icloud password
+        :return a reference to the icloud
         """
         api = PyiCloudService(user, password)
 
@@ -54,13 +55,13 @@ class IcloudPhotos:
         """
 
         # root, ext = os.path.splitext(photo.filename)
-        # format = ext.upper()
-        format = photo._master_record["fields"]["itemType"]["value"]
-        if (format not in ["public.jpeg", "public.png", "public.heic", "public.tiff"]):
-            logger.debug("[Invalid format %s - skip]", format)
+        # media_type = ext.upper()
+        media_type = photo._master_record["fields"]["itemType"]["value"]
+        if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.tiff"]):
+            logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 
-        logger.debug("[format %s OK]", format)
+        logger.debug("[media_type %s OK]", media_type)
         return True
 
     @staticmethod
@@ -99,7 +100,7 @@ class IcloudPhotos:
         eligible_photos = []
         i = 1
         for i, photo in enumerate(self.api.photos.albums[album]):
-            logger.debug("%d - Checking %s" % (i, photo.filename))
+            logger.debug("%d - Checking %s", i, photo.filename)
             # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
             if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, orientation):
                 logger.debug("Adding photo")
@@ -117,13 +118,11 @@ class IcloudPhotos:
         """
         for photo in photos:
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
-                logger.info("[%s %s %s]" % (
-                    photo.filename, photo.dimensions, photo._asset_record["fields"]["orientation"]["value"]))
+                logger.info("[%s %s %s]", photo.filename, photo.dimensions,
+                            photo._asset_record["fields"]["orientation"]["value"])
                 data = photo.download().raw.read()
-
                 # cannot crop HEIC images with Pillow
-                #crop_image(PIL.Image.open(os.io.BytesIO(data)), float(16 / 9))
-
+                # crop_image(PIL.Image.open(os.io.BytesIO(data)), float(16 / 9))
                 opened_file.write(data)
 
     def get_albums(self):

@@ -1,14 +1,17 @@
 import argparse
-import sys
 import logging
+import sys
 
 from icloud_photos import IcloudPhotos
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
+
 def main():
-    # read command-line args
+    """
+    Read command-line args and start the download
+    """
     parser = argparse.ArgumentParser(
         description="icloud photo frame")
     parser.add_argument("user", help="icloud user")
@@ -31,15 +34,15 @@ def main():
             print(album)
         sys.exit(1)
 
-    # get all photos in the photoframe album
+    # get all photos in the photo frame album
     logger.info("Downloading photo list...")
-    photos = IcloudPhotos.get_all_photos(args.album, args.orientation)
+    photos = api.get_all_photos(args.album, args.orientation)
 
     # get a random sample to download
-    logger.info("Selecting random sample (%d from %d)" % (args.sample, len(photos)))
+    logger.info("Selecting random sample (%d from %d)", args.sample, len(photos))
     photos_sample = photos.get_sample(photos, args.sample)
 
-    logger.info("Downloading photos to %s..." % args.output)
+    logger.info("Downloading photos to %s...", args.output)
     IcloudPhotos.download(photos_sample, args.output)
 
 

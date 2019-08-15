@@ -289,6 +289,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
 
 def exception_hook(exctype, value, traceback):
+    """
+    Handle exceptions in the Qt application. Prevents exceptions being consumed silently
+    :param exctype: the type of exception
+    :param value: the exception contents
+    :param traceback: the stack trace
+    """
     # Print the error and traceback
     print(exctype, value, traceback)
     # Call the normal Exception hook after
@@ -297,6 +303,9 @@ def exception_hook(exctype, value, traceback):
 
 
 def main():
+    """
+    Create the photo frame application
+    """
     sys._excepthook = sys.excepthook
     sys.excepthook = exception_hook
 
