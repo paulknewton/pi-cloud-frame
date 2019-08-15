@@ -1,0 +1,11 @@
+frame:
+    slideshow_delay: 30000
+    media_folder: media
+
+players:
+    Photo Player:
+        type: photo_player
+        folder: photos
+    Video Player:
+        type: video_player
+        folder: video

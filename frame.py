@@ -3,16 +3,13 @@ import logging
 import sys
 from abc import abstractmethod, ABC
 
+import yaml
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
-# delay between slide transitions (ms)
-SLIDESHOW_DELAY = 30000
-
-# location of all media
-MEDIA_FOLDER = "media"
+CONFIG_FILE = "config.yml"
 
 
 class AbstractMediaPlayer(ABC):
@@ -29,7 +26,7 @@ class AbstractMediaPlayer(ABC):
         :param folder: folder containing the media (images, video...)
         """
         self._name = name
-        self._media_folder = folder
+        self._folder = folder
         self._media_list = None
         self._current_media_index = None
 
@@ -51,7 +48,7 @@ class AbstractMediaPlayer(ABC):
         :return: a list of filenames
         """
         logger.debug("Refreshing media list for %s in folder %s", self.get_name(), self.get_folder())
-        self._media_list = glob.glob(MEDIA_FOLDER + "/" + self.get_folder() + "/*")
+        self._media_list = glob.glob(self.get_folder() + "/*")
 
         # leave index unchanged if possible (to allow playlist to be refreshed without side-effect of jumping to start
         if not self._current_media_index or self._current_media_index >= len(self._media_list):
@@ -73,7 +70,7 @@ class AbstractMediaPlayer(ABC):
 
         :return: the folder name
         """
-        return self._media_folder
+        return self._folder
 
     def get_playlist(self):
         """
@@ -162,12 +159,12 @@ class PhotoPlayer(AbstractMediaPlayer):
 
 
 class PhotoFrame(QtWidgets.QMainWindow):
-    def __init__(self, delay):
+    def __init__(self, config):
         super(PhotoFrame, self).__init__()
 
-        # setup media players
-        self.players = self.init_players()
-        self.current_player_index = 0
+        self.config = config
+        self.setup_general_config()
+        self.setup_players()
 
         self._build_UI()
         self.showFullScreen()
@@ -175,22 +172,56 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # start timer
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self._timer_callback)
-        timer.start(delay)
+        timer.start(self.slideshow_delay)
 
         # go...
         self.get_current_player().show_current_media()
 
-    @staticmethod
-    def init_players():
+    def setup_general_config(self):
+        frame_config = self._get_config_value(self.config, "frame", None)
+        if not frame_config:
+            logger.error("Could not find section 'frame' in config file. Exiting")
+            sys.exit(1)
+
+        self.slideshow_delay = self._get_config_value(frame_config, "slideshow_delay", 5000)
+        logger.info("Slideshow delay = %s", self.slideshow_delay)
+        self.media_folder = self._get_config_value(frame_config, "media_folder", "tmp")
+        logger.info("Media folder = %s", self.media_folder)
+
+    def setup_players(self):
         """
         Factory method to create the set of media players
 
         :return: a list of AbstractMediaPlayer instances
         """
-        players = [PhotoPlayer("Photo Player", "photos"), PhotoPlayer("Fritz Monitor", "fritz-monitor"),
-                   VideoPlayer("Video Player", "video")]
-        logger.info("Initialising players: %s", players)
-        return players
+        players_config = self._get_config_value(self.config, "players", None)
+        if not players_config:
+            logger.error("Could not find section 'players' in config file. Exiting")
+            sys.exit(1)
+
+        self.players = []
+        for item in players_config:
+            if players_config[item]["type"] == "photo_player":
+                player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
+            if players_config[item]["type"] == "video_player":
+                player = VideoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
+                logger.info("Creating player %s", player.get_name())
+            self.players.append(player)
+        self.current_player_index = 0
+
+    @staticmethod
+    def _get_config_value(config, key, default):
+        if not (config and key):
+            logger.debug("Using default for config value %s = %s", key, default)
+            return default
+
+        try:
+            value = config[key]
+        except KeyError:
+            logger.debug("Using default for config value %s = %s", key, default)
+            return default
+        logger.debug("Config value %s = %s", key, value)
+        return value
 
     def next_player(self):
         """
@@ -307,6 +338,18 @@ def exception_hook(exctype, value, traceback):
     sys.exit(1)
 
 
+def read_config():
+    try:
+        with open(CONFIG_FILE, 'r') as ymlfile:
+            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+    except FileNotFoundError:
+        logger.error("Could not load config file %s. Exiting.")
+        sys.exit(1)
+    # data = yaml.dump(cfg, Dumper=yaml.CDumper)
+    # print(data)
+    return cfg
+
+
 def main():
     """
     Create the photo frame application
@@ -316,7 +359,7 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
 
-    window = PhotoFrame(SLIDESHOW_DELAY)
+    window = PhotoFrame(read_config())
     window.raise_()
 
     app.exec_()
