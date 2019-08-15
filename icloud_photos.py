@@ -13,7 +13,8 @@ class IcloudPhotos:
     def __init__(self, user, password):
         self.api = self._connect(user, password)
 
-    def _connect(self, user, password):
+    @staticmethod
+    def _connect(user, password):
         """
         Connect to the icloud
 
