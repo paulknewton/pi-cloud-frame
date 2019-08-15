@@ -6,7 +6,7 @@ from abc import abstractmethod, ABC
 from PyQt5 import QtWidgets, QtGui, QtCore
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 # delay between slide transitions (ms)
 SLIDESHOW_DELAY = 30000
@@ -49,7 +49,11 @@ class AbstractMediaPlayer(ABC):
         """
         logger.debug("Refreshing media list for %s in folder %s", self.get_name(), self.get_folder())
         self._media_list = glob.glob(self.get_folder() + "/*")
-        self._current_media_index = 0
+
+        # leave index unchanged if possible (to allow playlist to be refreshed without side-effect of jumping to start
+        if not self._current_media_index or self._current_media_index >= len(self._media_list):
+            self._current_media_index = 0
+            logger.debug("Reset _current_media_index to 0")
         logger.debug("Loaded photo list: %s", self._media_list)
 
     def get_name(self):
@@ -87,6 +91,8 @@ class AbstractMediaPlayer(ABC):
         """
         Display the next media. If at the end of the playlist, jump to the start
         """
+        self.refresh_media_list()
+
         logger.debug("_current_media_index = %d", self._current_media_index)
         logger.debug("length _media_list = %d", len(self._media_list))
         if self._current_media_index >= len(self._media_list) - 1:
@@ -101,6 +107,8 @@ class AbstractMediaPlayer(ABC):
         """
         Display the previous media. If at the start of the playlist, jump to the end
         """
+        self.refresh_media_list()
+
         if self._current_media_index <= 0:
             logger.debug("Starting at end of media")
             self._current_media_index = len(self._media_list) - 1
@@ -217,13 +225,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         """
         return self.players[self.current_player_index]
 
-    def refresh_all_playlists(self):
-        """
-        Re-load media playlists for all players
-        """
-        for p in self.players:
-            p.refresh_media_list()
-
     def _timer_callback(self):
         self.get_current_player().next()
 
@@ -281,9 +282,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         if key_press == QtCore.Qt.Key_Up:
             self.prev_player()
         if key_press == 32:
-            self.refresh_all_playlists()
+            self.refresh_current_playlist()
         if key_press == QtCore.Qt.Key_Down:
             self.next_player()
+
+    def refresh_current_playlist(self):
+        self.get_current_player().refresh_media_list()
 
 
 def exception_hook(exctype, value, traceback):
