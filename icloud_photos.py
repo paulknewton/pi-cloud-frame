@@ -43,7 +43,7 @@ class IcloudPhotos:
                 print("Failed to verify verification code")
                 sys.exit(1)
 
-        self.api = api
+        return api
 
     @staticmethod
     def is_image(photo):

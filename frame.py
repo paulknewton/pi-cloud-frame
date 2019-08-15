@@ -61,7 +61,7 @@ class AbstractMediaPlayer(ABC):
         return self._name
 
     def get_folder(self):
-        """"
+        """
         Get the location of the folder containing the media
 
         :return: the folder name
@@ -107,9 +107,6 @@ class AbstractMediaPlayer(ABC):
         else:
             self._current_media_index -= 1
         self.show_current_media()
-
-    def _set_main_widget(self, widget):
-        self._main_window = widget
 
 
 class VideoPlayer(AbstractMediaPlayer):
@@ -179,7 +176,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         :return: a list of AbstractMediaPlayer instances
         """
-        players = [PhotoPlayer("Photo Player", "photos"), PhotoPlayer("Photo Player 2", "photos2"), VideoPlayer("Video Player", "video")]
+        players = [PhotoPlayer("Photo Player", "photos"), PhotoPlayer("Photo Player 2", "photos2"),
+                   VideoPlayer("Video Player", "video")]
         logger.info("Initialising players: %s", players)
         return players
 
