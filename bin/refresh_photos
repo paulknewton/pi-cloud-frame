@@ -1,51 +1,85 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
-# Download a set of random photos from icloud and crop to the correct aspect ratio
+# Download a set of random photos from icloud and crop to the correct aspect ratio.
+# Supports different digital frame profiles
+#
 
-USAGE="refresh_photos.sh icloud_id icloud_pwd download_folder crop_folder sample_size"
+USAGE="refresh_photos icloud_id icloud_pwd profile photoframe num_photos
 
-if [ $# -ne 3 ]; then
-  echo $USAGE
-  exit 1
+if [ $# -ne 5 ]; then
+    echo $USAGE
+    exit 1
 fi
 
-MEDIA_FOLDER=media
-DOWNLOAD=$MEDIA_FOLDER/raw		# folder to store raw downloaded photos
-CROPPED=$MEDIA_FOLDER/cropped		# folder to store re-cropped photos (with correct aspect ratio)
-OUT=$MEDIA_FOLDER/photos
-SAMPLE_SIZE=$3		# number of photos to download
-ALBUM=photoframe
+ICLOUD_USER=$1
+ICLOUD_PWD=$2
+FRAME_PROFILE=$3
+ALBUM=$4
+SAMPLE_SIZE=$5
+
+case $3 in
+    nixplay)
+        DOWNLOAD=/tmp/raw
+        CROPPED=/tmp/crop
+        OUT=media/nixplay
+        ASPECT="16:9"
+        ;;
+    pi-cloud-frame)
+        DOWNLOAD=/tmp/raw
+        CROPPED=/tmp/crop
+        OUT=media/photos
+        ASPECT="800:480"
+        ;;
+    *)
+        echo Unknown profile $3. Exiting.
+        exit 1
+esace
+
 
 ROOT=`pwd`
 
-# empty the current set of raw images (normally already done)
+cat << EOF
+Summary:
+----------------
+Profile: $FRAME_PROFILE
+Download folder: $DOWNLOAD
+Crop folder: $CROPPED
+Output folder: $OUT
+icloud user: $ICLOUD_USER
+icloud album: $ALBUM
+# photos to download: $SAMPLE_SIZE
+EOF
+
+mkdir -p "$DOWNLOAD"
+echo "Cleaning download folder $DOWNLOAD..."
 rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
 echo "Downloading photos to $DOWNLOAD..."
-python3 downloader.py "$1" "$2" --output "$DOWNLOAD" --album $ALBUM --sample $SAMPLE_SIZE
+python3 downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album $ALBUM --sample $SAMPLE_SIZE
 
-# empty the current set of cropped images
+mkdir -p "$CROPPED"
+echo "Cleaning crop folder $CROPPED..."
 rm -f "$CROPPED"/*
 
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
-for i in "$ROOT/$DOWNLOAD"/*; do echo `basename "$i"`; aspectcrop -a 800:480 "$i" `basename "$i"`; done
-cd "$ROOT" 
+for i in "$ROOT/$DOWNLOAD"/*; do echo `basename "$i"`; aspectcrop -a "$ASPECT" "$i" `basename "$i"`; done
+cd "$ROOT"
 
-# clean out the raw photos
+echo "Cleaning download folder $DOWNLOAD..."
 rm -f "$DOWNLOAD"/*
 
-# empty the current set of final images (currently in use)
+mkdir -p "$OUT"
+echo "Cleaning final output  folder $OUT..."
 rm -f "$OUT"/*
 
 # convert the new photos
-echo "Converting photos from $CROPPED to $OUT..."
+echo "Converting photos in $CROPPED to $OUT..."
 cd "$OUT"
 for i in "$ROOT/$CROPPED"/*; do echo `basename "$i"`; convert "$i" `basename "$i"`.jpg; done
-#for i in "$ROOT/$CROPPED"/*; do echo `basename $i`; mv "$i" .; done
-cd $ROOT
+cd "$ROOT"
 
-# empty the current set of cropped images
+echo "Cleaning crop folder $CROPPED..."
 rm -f "$CROPPED"/*
