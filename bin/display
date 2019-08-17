@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Switch Pi display on/off
+#
 
 USAGE="usage: display {on|off}"
 
@@ -16,7 +18,7 @@ case $1 in
         echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power > /dev/null
         ;;
     *)
-        echo "unknown argument $1"
+        echo "Unknown argument $1. Exiting."
         echo $USAGE
         exit 1
 esac
