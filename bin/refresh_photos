@@ -4,7 +4,9 @@
 # Supports different digital frame profiles
 #
 
-USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos
+USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos"
+
+TEST=
 
 if [ $# -ne 5 ]; then
     echo $USAGE
@@ -24,7 +26,7 @@ case $3 in
         OUT=media/nixplay
         ASPECT="16:9"
         ;;
-    pi-cloud-frame)
+    pi)
         DOWNLOAD=/tmp/raw
         CROPPED=/tmp/crop
         OUT=media/photos
@@ -33,7 +35,7 @@ case $3 in
     *)
         echo Unknown profile $3. Exiting.
         exit 1
-esace
+esac
 
 
 ROOT=`pwd`
@@ -52,34 +54,42 @@ EOF
 
 mkdir -p "$DOWNLOAD"
 echo "Cleaning download folder $DOWNLOAD..."
-rm -f "$DOWNLOAD"/*
+$TEST rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
 echo "Downloading photos to $DOWNLOAD..."
-python3 downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album $ALBUM --sample $SAMPLE_SIZE
+./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album $ALBUM --sample $SAMPLE_SIZE
 
 mkdir -p "$CROPPED"
 echo "Cleaning crop folder $CROPPED..."
-rm -f "$CROPPED"/*
+$TEST rm -f "$CROPPED"/*
 
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
-for i in "$ROOT/$DOWNLOAD"/*; do echo `basename "$i"`; aspectcrop -a "$ASPECT" "$i" `basename "$i"`; done
+for i in "$ROOT/$DOWNLOAD"/*;
+do
+    echo `basename "$i"`
+    $TEST aspectcrop -a "$ASPECT" "$i" `basename "$i"`
+done
 cd "$ROOT"
 
 echo "Cleaning download folder $DOWNLOAD..."
-rm -f "$DOWNLOAD"/*
+$TEST rm -f "$DOWNLOAD"/*
 
 mkdir -p "$OUT"
 echo "Cleaning final output  folder $OUT..."
-rm -f "$OUT"/*
+$TEST rm -f "$OUT"/*
 
 # convert the new photos
 echo "Converting photos in $CROPPED to $OUT..."
 cd "$OUT"
-for i in "$ROOT/$CROPPED"/*; do echo `basename "$i"`; convert "$i" `basename "$i"`.jpg; done
+for i in "$ROOT/$CROPPED"/*
+do
+    echo `basename "$i"`
+    $TEST convert "$i" `basename "$i"`.jpg
+done
 cd "$ROOT"
 
 echo "Cleaning crop folder $CROPPED..."
-rm -f "$CROPPED"/*
+$TEST rm -f "$CROPPED"/*
