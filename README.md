@@ -44,10 +44,10 @@ The code has 2 parts: downloading the photos and displaying the photos
 
 ### Downloading the photos
 
-Just run the script ```refresh_photos``` with the relevant parameters:
+Just run the script ```refresh_photos``` with the relevant parameters from the root directory:
 
 ```
-refresh_photos icloud_id icloud_pwd profile album num_photos
+./bin/refresh_photos icloud_id icloud_pwd profile album num_photos
 ```
 where:
 * icloud_id - your apple ID
@@ -58,7 +58,7 @@ where:
 
 The script retrieves the list of photos in the specified album. Any portrait photos are ignored, and a random sample is taken from the remaining photos. The script then downloads the photos and crops them to the appropriate aspect ration using the "convert" tool from the imagemagick suite. The cropped photos are saved in the output photo, and any temporary photos are cleaned up.
 
-For reference, the main python script is icloud_photos.py which takes a series of arguments as follows:
+For reference, the main python script is ```icloud_photos.py``` which takes a series of arguments as follows:
 ```
 usage: icloud_photos.py [-h] [--output OUTPUT] [--sample SAMPLE]
                         [--album ALBUM] [--orientation {portrait,landscape}]
