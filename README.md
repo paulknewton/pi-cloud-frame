@@ -20,30 +20,23 @@ But there were a few things that I really missed:
 
 * no automatic syncing of new photos - all photos need to be manually pushed to the digital frame. This means more manual effort for adding new photos. And uploading the many 1000s of photos I have accumulated over the years is pretty much out of the question
 
-This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required.
+This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required. The photo display software is written in Qt5 and shows the photos in sequence. It also supports the idea of 'stacked' photo viewers (a list of slideshows that you can switch between).
 
 Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box really.
 
 ## Install
 
-The main code to download photos is written in python, using the pyicloud library. Install everything via pip. If you are not using virtualenv then you will probably need to run this as super-user via "sudo":
+The main code to download photos is written in python, using the pyicloud library for downloading photos and Qt for the user interface. Install everything via pip. If you are not using virtualenv then you will probably need to run this as super-user via "sudo":
 
 ```
 pip install -r requirements.txt
 ```
 
-The cropping is done using the imagemagick libraries (I tried to do this using in python with PIL/Pillow, but these do not have support for the .HEIC image format).
+The cropping is done using the imagemagick libraries. I tried to do this using in python with ```PIL/Pillow```, but these do not have support for the .HEIC image format.
 
 ```
 sudo apt install imagemagick
 ```
-
-And finally, the photos are shown on the screen using the "fbi" image viewer. You could use your favourite image viewer/screensaver here.
-
-```
-sudo apt install fbi
-```
-
 
 ## Running the code
 
@@ -51,13 +44,21 @@ The code has 2 parts: downloading the photos and displaying the photos
 
 ### Downloading the photos
 
-Just run the python code, along with the user/pwd icloud details. The program uses default values for everything else.
+Just run the script ```refresh_photos``` with the relevant parameters:
 
 ```
-python3 myuser mypwd
+refresh_photos icloud_id icloud_pwd profile album num_photos
 ```
+where:
+* icloud_id - your apple ID
+* icloud_pwd - your apple password
+* profile - the type of photo frame device. Currently supports ```pi``` or ```nixplay```
+* photoalbum - the icloud album to use as the source of the photos
+* num_photos - the number of photos to download (or less if the album does not have enough photos)
 
-The program supports different command line arguments that you can use:
+The script retrieves the list of photos in the specified album. Any portrait photos are ignored, and a random sample is taken from the remaining photos. The script then downloads the photos and crops them to the appropriate aspect ration using the "convert" tool from the imagemagick suite. The cropped photos are saved in the output photo, and any temporary photos are cleaned up.
+
+For reference, the main python script is icloud_photos.py which takes a series of arguments as follows:
 ```
 usage: icloud_photos.py [-h] [--output OUTPUT] [--sample SAMPLE]
                         [--album ALBUM] [--orientation {portrait,landscape}]
@@ -78,22 +79,40 @@ optional arguments:
                         orientation of photos
 ```
 
-Once you are happy with the parameters that you need, just run this via a cron job on a periodic basis so that photos get refreshed.
-
-```
-crontab -e
-```
-
-then add a line like this:
-
-```
-0 0 * * * /usr/bin/python3 /home/pi/pi-cloud-frame/icloud_photos.py myuser mypwd --sample 100 --album myphotos --orientation portrait
-```
-
-to kick-off the script each day at midnight.
 
 ### Displaying the photos
 
+The photo frame display is written as a Qt5 application. It scans the specified folder for any photos and displays them one at a time before jumping to the next. The folder is scanned after each photo for any updates. The application also supports a 'stack' of media players, allowing the user to switch between multiple slideshows at any time.
+
+The program needs to be configured in ```config.yml``` to specify the folders to search. A sample file is included in ```config_sample.yml```. The configuration consists of 2 parts:
+
 ```
-todo
+frame:
+    slideshow_delay: 30000
+    media_folder: media
+
+players:
+    Photo Player:
+        type: photo_player
+        folder: photos
+    Video Player:
+        type: video_player
+        folder: video
 ```
+* frame
+    General config parameters for the display frame:
+    * slideshow_delay: the delay (in ms) between photo transitions
+    * media_folder: the main root of the media files (each player has a sub-folder under this directory)
+* players
+    A list of media players.
+    * type: the type of media player. The current implementation only support photo_player (video_player is allowed, but is not yet implemented)
+    * folder: the sub-folder under ```media_folder``` where the photos/videos are found
+
+Once the photo frame has been configured, run it by typing:
+```
+./frame.py
+```
+
+The application opens and runs the first media player (in the above example photo player). At any time, the user can jump to the next photo by clicking on the right-hand side of the screen, or jump back to the previous photo by clicking on the left-hand side.
+
+If the user clicks on the top or bottom parts of the screen, it jumps to the previous/next media player (if any are configured). In the example above, it would switch to the video player. 
