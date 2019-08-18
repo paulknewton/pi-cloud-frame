@@ -1,10 +1,13 @@
+#! /usr/bin/env python3
+
 import glob
 import logging
 import sys
 from abc import abstractmethod, ABC
-
+import menu
 import yaml
 from PyQt5 import QtWidgets, QtGui, QtCore
+import exifread
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -87,6 +90,15 @@ class AbstractMediaPlayer(ABC):
         """
         pass
 
+    def get_current_media_exif(self):
+        if not self._media_list:
+            self.main_window.setText("Media Player %s: No media to show" % self.get_name())
+            return
+
+        image_filename = self._media_list[self._current_media_index]
+        with open(image_filename, 'rb') as f:
+            return image_filename, exifread.process_file(f, details=False)
+
     def next(self):
         """
         Display the next media. If at the end of the playlist, jump to the start
@@ -167,6 +179,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.setup_players()
 
         self._build_UI()
+        self.popup = None
         self.showFullScreen()
 
         # start timer
@@ -293,12 +306,18 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         if x >= width * 0.8:
             self.get_current_player().next()
-        if x <= width * 0.2:
+        elif x <= width * 0.2:
             self.get_current_player().prev()
-        if y >= height * 0.8:
+        elif y >= height * 0.8:
             self.next_player()
-        if y <= height * 0.2:
+        elif y <= height * 0.2:
             self.prev_player()
+        else:
+            logger.info("Open popup")
+            if not self.popup:
+                self.popup = menu.Popup()
+            filename, exif = self.get_current_player().get_current_media_exif()
+            self.popup.show_image_details(filename, exif)
 
     def keyPressEvent(self, key):
         """
@@ -343,7 +362,7 @@ def read_config():
         with open(CONFIG_FILE, 'r') as ymlfile:
             cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
     except FileNotFoundError:
-        logger.error("Could not load config file %s. Exiting.")
+        logger.error("Could not load config file %s. Exiting.", CONFIG_FILE)
         sys.exit(1)
     # data = yaml.dump(cfg, Dumper=yaml.CDumper)
     # print(data)
