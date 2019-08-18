@@ -10,7 +10,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import exifread
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 CONFIG_FILE = "config.yml"
 
