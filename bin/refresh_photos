@@ -4,7 +4,7 @@
 # Supports different digital frame profiles
 #
 
-USAGE="refresh_photos icloud_id icloud_pwd profile photoframe num_photos
+USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos
 
 if [ $# -ne 5 ]; then
     echo $USAGE
