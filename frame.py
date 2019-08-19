@@ -176,7 +176,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         self.players = None
         self.current_player_index = 0
-        
+
         self.config = config
         self.setup_general_config()
         self.setup_players()
