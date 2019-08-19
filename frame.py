@@ -361,6 +361,11 @@ def exception_hook(exctype, value, traceback):
 
 
 def read_config():
+    """
+    Read configuration file and return a dictionary of parameters
+
+    :return: a dictionary of parameters representing the YAML file (see YAML spec)
+    """
     try:
         with open(CONFIG_FILE, 'r') as ymlfile:
             cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
