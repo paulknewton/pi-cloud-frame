@@ -22,17 +22,17 @@ But there were a few things that I really missed:
 
 This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required. The photo display software is written in Qt5 and shows the photos in sequence. It also supports the idea of 'stacked' photo viewers (a list of slideshows that you can switch between).
 
-Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box really.
+Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box really. The download part can be used without the front-end application (e.g. to download icloud photos for other photos frames).
 
 ## Install
 
-The main code to download photos is written in python, using the pyicloud library for downloading photos and Qt for the user interface. Install everything via pip. If you are not using virtualenv then you will probably need to run this as super-user via "sudo":
+The main code to download photos is written in python, using the ```pyicloud``` library, and Qtv5 for the user interface. Install everything via pip. If you are not using virtualenv then you will probably need to run this as super-user via "sudo":
 
 ```
 pip install -r requirements.txt
 ```
 
-The cropping is done using the imagemagick libraries. I tried to do this using in python with ```PIL/Pillow```, but these do not have support for the .HEIC image format.
+The cropping is done using the ```imagemagick``` libraries. I tried to do this using in python with ```PIL/Pillow```, but these do not have support for the .HEIC image format.
 
 ```
 sudo apt install imagemagick
@@ -115,4 +115,4 @@ Once the photo frame has been configured, run it by typing:
 
 The application opens and runs the first media player (in the above example photo player). At any time, the user can jump to the next photo by clicking on the right-hand side of the screen, or jump back to the previous photo by clicking on the left-hand side.
 
-If the user clicks on the top or bottom parts of the screen, it jumps to the previous/next media player (if any are configured). In the example above, it would switch to the video player. 
+If the user clicks on the top or bottom parts of the screen, it jumps to the previous/next media player (if any are configured). In the example above, it would switch to the video player. This allows multiple slide shows to be running in parallel.
