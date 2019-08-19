@@ -18,7 +18,7 @@ But there were a few things that I really missed:
 
 * no auto-cropping - the frame uses 16:9 aspect ratio while most of my photos are 3:2. I have to manually crop these to get them to fit the frame
 
-* no automatic syncing of new photos - all photos need to be manually pushed to the digital frame. This means more manual effort for adding new photos. And uploading the many 1000s of photos I have accumulated over the years is pretty much out of the question
+* no automatic syncing of new photos - all photos need to be manually pushed to the digital frame. This means more manual effort for adding new photos. And uploading the many 1000s of photos I have accumulated over the years is pretty much out of the question. (UDPATE: Nixplay now support [Dynamic Playlists](https://blog.nixplay.com/2018/10/nixplays-dynamic-playlists-explained) from Google Photos and Dropbox)
 
 This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required. The photo display software is written in Qt5 and shows the photos in sequence. It also supports the idea of 'stacked' photo viewers (a list of slideshows that you can switch between).
 
