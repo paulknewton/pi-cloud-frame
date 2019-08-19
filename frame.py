@@ -174,6 +174,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def __init__(self, config):
         super(PhotoFrame, self).__init__()
 
+        self.players = None
+        self.current_player_index = 0
+        
         self.config = config
         self.setup_general_config()
         self.setup_players()
