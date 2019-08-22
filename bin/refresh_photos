@@ -60,7 +60,7 @@ $TEST rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
 echo "Downloading photos to $DOWNLOAD..."
-./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album $ALBUM --sample $SAMPLE_SIZE --orientation $ORIENTATION
+./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" --orientation "$ORIENTATION"
 
 mkdir -p "$CROPPED"
 echo "Cleaning crop folder $CROPPED..."
