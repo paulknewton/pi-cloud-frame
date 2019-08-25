@@ -55,6 +55,9 @@ class IcloudPhotos:
         @:return: True if the photo is an image, otherwise False
         """
 
+        if not photo:
+            return False
+
         # root, ext = os.path.splitext(photo.filename)
         # media_type = ext.upper()
         media_type = photo._master_record["fields"]["itemType"]["value"]
@@ -74,6 +77,12 @@ class IcloudPhotos:
         :param orientation: portrait or landscape
         :return: True if the photo orientation matches the specified orientation
         """
+
+        if not photo:
+            return False
+
+        if not orientation in ("portrait", "landscape"):
+            raise ValueError("orientation must be one of portrait or landscape")
 
         photo_orientation = photo._asset_record["fields"]["orientation"]["value"]
         width, height = photo.dimensions
