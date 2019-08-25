@@ -1,13 +1,14 @@
 #! /usr/bin/env python3
-
-import glob
 import logging
 import sys
-from abc import abstractmethod, ABC
-import menu
+
 import yaml
-from PyQt5 import QtWidgets, QtGui, QtCore
-import exifread
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import Qt
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QDialog, QLabel, QVBoxLayout, QPushButton
+
+from media_players import VideoPlayer, PhotoPlayer
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -15,159 +16,55 @@ logging.basicConfig(level=logging.DEBUG)
 CONFIG_FILE = "config.yml"
 
 
-class AbstractMediaPlayer(ABC):
-    """
-    Abstract base class for all media players
-    """
+class Popup(QDialog):
+    def __init__(self):
+        super().__init__()
 
-    def __init__(self, name, folder):
-        """
-        Create a default abstract media player.
-        All sub-classes should call this parent constructor.
+        self.filename_label = None
+        self.date_label = None
+        self._build_UI()
 
-        :param name: string used to refer to the media player
-        :param folder: folder containing the media (images, video...)
-        """
-        self._name = name
-        self._folder = folder
-        self._media_list = None
-        self._current_media_index = None
+    def show_image_details(self, filename, tags):
+        logger.debug("exif tags: %s", tags)
 
-        self.refresh_media_list()
+        self.filename_label.setText("Photo filename: %s" % filename)
+        self.filename_label.adjustSize()
+        date = longRef = long = latRef = lat = ""
+        if "EXIF DateTimeOriginal" in tags.keys():
+            date = tags["EXIF DateTimeOriginal"]
+        if "GPS GPSLatitudeRef" in tags.keys():
+            latRef = tags["GPS GPSLatitudeRef"]
+        if "GPS GPSLatitude" in tags.keys():
+            lat = tags["GPS GPSLatitude"]
+        if "GPS GPSLongitudeRef" in tags.keys():
+            longRef = tags["GPS GPSLongitudeRef"]
+        if "GPS GPSLongitude" in tags.keys():
+            long = tags["GPS GPSLongitude"]
 
-    @abstractmethod
-    def get_main_widget(self):
-        """
-        Get the top-level widget of the media player
+        self.date_label.setText(
+            "Date: %s\nGPS GPSLatitude: %s %s\nGPS GPSLongitude: %s %s" % (date, latRef, lat, longRef, long))
+        self.date_label.adjustSize()
 
-        :return: the top-level widget
-        """
-        pass
+        self.show()
 
-    def refresh_media_list(self):
-        """
-        Re-load the media list from the filesystem
+    def _build_UI(self):
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignLeft)
+        self.setLayout(layout)
 
-        :return: a list of filenames
-        """
-        logger.debug("Refreshing media list for %s in folder %s", self.get_name(), self.get_folder())
-        self._media_list = glob.glob(self.get_folder() + "/*")
+        self.filename_label = QLabel(self)
+        layout.addWidget(self.filename_label)
 
-        # leave index unchanged if possible (to allow playlist to be refreshed without side-effect of jumping to start
-        if not self._current_media_index or self._current_media_index >= len(self._media_list):
-            self._current_media_index = 0
-            logger.debug("Reset _current_media_index to 0")
-        logger.debug("Loaded photo list: %s", self._media_list)
+        self.date_label = QLabel(self)
+        layout.addWidget(self.date_label)
 
-    def get_name(self):
-        """
-        Get the name of the media player
+        whatsapp_button = QPushButton("Send photo")
+        whatsapp_button.clicked.connect(self.on_click)
+        layout.addWidget(whatsapp_button)
 
-        :return: textual name of the media player
-        """
-        return self._name
-
-    def get_folder(self):
-        """
-        Get the location of the folder containing the media
-
-        :return: the folder name
-        """
-        return self._folder
-
-    def get_playlist(self):
-        """
-        Get a list of media to be played by this media player
-
-        :return: list of filenames
-        """
-        return self._media_list
-
-    @abstractmethod
-    def show_current_media(self):
-        """
-        Display the current media
-        """
-        pass
-
-    def get_current_media_exif(self):
-        if not self._media_list:
-            self.main_window.setText("Media Player %s: No media to show" % self.get_name())
-            return
-
-        image_filename = self._media_list[self._current_media_index]
-        with open(image_filename, 'rb') as f:
-            return image_filename, exifread.process_file(f, details=False)
-
-    def next(self):
-        """
-        Display the next media. If at the end of the playlist, jump to the start
-        """
-        self.refresh_media_list()
-
-        logger.debug("_current_media_index = %d", self._current_media_index)
-        logger.debug("length _media_list = %d", len(self._media_list))
-        if self._current_media_index >= len(self._media_list) - 1:
-            logger.debug("Starting at beginning of media")
-            self._current_media_index = 0
-        else:
-            self._current_media_index += 1
-            logger.debug("Setting _current_media_index to %d", self._current_media_index)
-        self.show_current_media()
-
-    def prev(self):
-        """
-        Display the previous media. If at the start of the playlist, jump to the end
-        """
-        self.refresh_media_list()
-
-        if self._current_media_index <= 0:
-            logger.debug("Starting at end of media")
-            self._current_media_index = len(self._media_list) - 1
-        else:
-            self._current_media_index -= 1
-        self.show_current_media()
-
-
-class VideoPlayer(AbstractMediaPlayer):
-    def __init__(self, name, folder):
-        super().__init__(name, folder)
-
-    def get_main_widget(self):
-        # TODO implement video player
-        pass
-
-    def show_current_media(self):
-        # TODO implement video player
-        pass
-
-
-class PhotoPlayer(AbstractMediaPlayer):
-
-    def __init__(self, name, folder):
-        super().__init__(name, folder)
-        self.main_window = QtWidgets.QLabel()
-        self.main_window.setAlignment(QtCore.Qt.AlignCenter)
-
-    def get_main_widget(self):
-        return self.main_window
-
-    def show_current_media(self):
-        if not self._media_list:
-            self.main_window.setText("Media Player %s: No media to show" % self.get_name())
-            return
-
-        image_filename = self._media_list[self._current_media_index]
-        logger.debug("Showing image %s", image_filename)
-        image = QtGui.QImage(image_filename)
-        if image:
-            pmap = QtGui.QPixmap.fromImage(image)
-            self.main_window.setPixmap(pmap.scaled(
-                self.get_main_widget().size(),
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation))
-        else:
-            logger.info("Could not load image: %s", image_filename)
+    @pyqtSlot()
+    def on_click(self):
+        logger.info("PyQt5 button click. TODO")
 
 
 class PhotoFrame(QtWidgets.QMainWindow):
@@ -318,7 +215,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         else:
             logger.info("Open popup")
             if not self.popup:
-                self.popup = menu.Popup()
+                self.popup = Popup()
             filename, exif = self.get_current_player().get_current_media_exif()
             self.popup.show_image_details(filename, exif)
 
