@@ -5,7 +5,6 @@ import sys
 from pyicloud import PyiCloudService
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 class IcloudPhotos:
