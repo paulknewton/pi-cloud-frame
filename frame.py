@@ -228,6 +228,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         key_press = key.key()
         if key_press == QtCore.Qt.Key_Escape:
             self.close()
+            sys.exit(0)
         if key_press == QtCore.Qt.Key_Left:
             self.get_current_player().prev()
         if key_press == QtCore.Qt.Key_Right:
