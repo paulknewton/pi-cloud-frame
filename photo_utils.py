@@ -1,4 +1,10 @@
+import logging
 import random
+
+from geopy.geocoders import Nominatim
+from geopy.point import Point
+
+logger = logging.getLogger(__name__)
 
 
 def get_sample(photos, n):
@@ -10,7 +16,7 @@ def get_sample(photos, n):
     :return: a random list of samples containing n items (or fewer if there are not enough photos)
     """
     n = min(n, len(photos))
-    n = max(n, 0)   # avoid -ve numbers
+    n = max(n, 0)  # avoid -ve numbers
     return random.sample(photos, n)
 
 
@@ -31,3 +37,12 @@ def crop_image(image, aspect_ratio):
     # image.show()
 
     return image
+
+
+def get_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref):
+    logger.debug("Checking gps location: %s", locals())
+    geolocator = Nominatim(user_agent="pi-cloud-frame")
+    location_point = Point("%d %d' %f'' %s, %d %d' %f'' %s" % (lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref))
+    location = geolocator.reverse(location_point)
+
+    return location.address

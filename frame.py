@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog, QLabel, QVBoxLayout, QPushButton
 
+import photo_utils
 from media_players import VideoPlayer, PhotoPlayer
 
 logger = logging.getLogger(__name__)
@@ -27,38 +28,45 @@ class Popup(QDialog):
     def show_image_details(self, filename, tags):
         logger.debug("exif tags: %s", tags)
 
-        self.filename_label.setText("Photo filename: %s" % filename)
-        self.filename_label.adjustSize()
-        date = longRef = long = latRef = lat = ""
+        logger.info("Filename: %s", filename)
+
+        # extract EXIF data (if any)
+        date = location = "<unknown>"
+        long_ref = long = lat_ref = lat = location = ""
         if "EXIF DateTimeOriginal" in tags.keys():
             date = tags["EXIF DateTimeOriginal"]
+
         if "GPS GPSLatitudeRef" in tags.keys():
-            latRef = tags["GPS GPSLatitudeRef"]
+            lat_ref = tags["GPS GPSLatitudeRef"]
+
         if "GPS GPSLatitude" in tags.keys():
             lat = tags["GPS GPSLatitude"]
+
         if "GPS GPSLongitudeRef" in tags.keys():
-            longRef = tags["GPS GPSLongitudeRef"]
+            long_ref = tags["GPS GPSLongitudeRef"]
+
         if "GPS GPSLongitude" in tags.keys():
             long = tags["GPS GPSLongitude"]
 
-        self.date_label.setText(
-            "Date: %s\nGPS GPSLatitude: %s %s\nGPS GPSLongitude: %s %s" % (date, latRef, lat, longRef, long))
-        self.date_label.adjustSize()
+        # if we have GPS data, reverse lookup address
+        if all([lat, lat_ref, long, long_ref]):
+            lat_d, lat_m, lat_s = tuple(lat.values)
+            long_d, long_m, long_s = tuple(long.values)
+            location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den, lat_ref, long_d.num / long_d.den, long_m.num / long_m.den, long_s.num / long_s.den, long_ref)
 
+        self.date_label.setText("Filename: %s\nDate: %s\nLocation: %s" % (filename, date, location))
+        self.date_label.adjustSize()
         self.show()
 
     def _build_UI(self):
-        layout = QVBoxLayout()
+        layout = QVBoxLayout(self)
         layout.setAlignment(Qt.AlignLeft)
         self.setLayout(layout)
-
-        self.filename_label = QLabel(self)
-        layout.addWidget(self.filename_label)
 
         self.date_label = QLabel(self)
         layout.addWidget(self.date_label)
 
-        whatsapp_button = QPushButton("Send photo")
+        whatsapp_button = QPushButton("Send photo", self)
         whatsapp_button.clicked.connect(self.on_click)
         layout.addWidget(whatsapp_button)
 
@@ -177,13 +185,14 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
     def _build_UI(self):
         # setup UI - use a QStackedWidget to avoid widgets being destroyed
-        self.stack = QtWidgets.QStackedWidget()
+        self.stack = QtWidgets.QStackedWidget(self)
         for p in self.players:
             player_widget = p.get_main_widget()
             if player_widget:
+                player_widget.setParent(self)
                 self.stack.addWidget(player_widget)
             else:
-                not_implemented = QtWidgets.QLabel("Media Player %s: Not yet implemented" % p.get_name())
+                not_implemented = QtWidgets.QLabel("Media Player %s: Not yet implemented" % p.get_name(), self)
                 not_implemented.setAlignment(QtCore.Qt.AlignCenter)
                 self.stack.addWidget(not_implemented)
         self.setCentralWidget(self.stack)
