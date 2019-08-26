@@ -4,7 +4,7 @@ bitstring==3.1.6
 certifi==2019.6.16
 chardet==3.0.4
 click==6.7
-exifread=2.1.2
+exifread==2.1.2
 future==0.17.1
 idna==2.8
 importlib-metadata==0.18
