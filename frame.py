@@ -25,28 +25,28 @@ class Popup(QDialog):
         self.date_label = None
         self._build_UI()
 
-    def show_image_details(self, filename, tags):
-        logger.debug("exif tags: %s", tags)
+    def show_image_details(self, filename, exif_tags):
+        logger.debug("exif tags: %s", exif_tags)
 
         logger.info("Filename: %s", filename)
 
         # extract EXIF data (if any)
         date = location = "<unknown>"
         long_ref = long = lat_ref = lat = location = ""
-        if "EXIF DateTimeOriginal" in tags.keys():
-            date = tags["EXIF DateTimeOriginal"]
+        if "EXIF DateTimeOriginal" in exif_tags.keys():
+            date = exif_tags["EXIF DateTimeOriginal"]
 
-        if "GPS GPSLatitudeRef" in tags.keys():
-            lat_ref = tags["GPS GPSLatitudeRef"]
+        if "GPS GPSLatitudeRef" in exif_tags.keys():
+            lat_ref = exif_tags["GPS GPSLatitudeRef"]
 
-        if "GPS GPSLatitude" in tags.keys():
-            lat = tags["GPS GPSLatitude"]
+        if "GPS GPSLatitude" in exif_tags.keys():
+            lat = exif_tags["GPS GPSLatitude"]
 
-        if "GPS GPSLongitudeRef" in tags.keys():
-            long_ref = tags["GPS GPSLongitudeRef"]
+        if "GPS GPSLongitudeRef" in exif_tags.keys():
+            long_ref = exif_tags["GPS GPSLongitudeRef"]
 
-        if "GPS GPSLongitude" in tags.keys():
-            long = tags["GPS GPSLongitude"]
+        if "GPS GPSLongitude" in exif_tags.keys():
+            long = exif_tags["GPS GPSLongitude"]
 
         # if we have GPS data, reverse lookup address
         if all([lat, lat_ref, long, long_ref]):
