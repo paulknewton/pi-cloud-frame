@@ -7,6 +7,7 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
+from PyQt5.QtGui import QFont
 
 import photo_utils
 from media_players import VideoPlayer, PhotoPlayer
@@ -70,14 +71,21 @@ class Popup(QDialog):
         layout = QGridLayout(self)
         self.value_widgets = []
 
+        # font used in popup dialog
+        font = QFont()
+        font.setPointSize(14)
+
         # create labels and empty values
         for y, label in enumerate(self.labels):
             label_widget = QLabel(label, self)
             label_widget.setAlignment(QtCore.Qt.AlignRight)
+            label_widget.setFont(font)
             layout.addWidget(label_widget, y, 0)
+
             value_widget = QLabel(self)
-            self.value_widgets.append(value_widget)
+            value_widget.setFont(font)
             layout.addWidget(value_widget, y, 1)
+            self.value_widgets.append(value_widget)
 
         whatsapp_button = QPushButton("Send photo", self)
         whatsapp_button.clicked.connect(self.on_click)
