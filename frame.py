@@ -56,6 +56,9 @@ class Popup(QDialog):
             long_d, long_m, long_s = tuple(long.values)
             location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den, lat_ref, long_d.num / long_d.den, long_m.num / long_m.den, long_s.num / long_s.den, long_ref)
 
+            # reformat lines
+            location = "\n".join(location.split(", "))
+
         self.value_widgets[1].setText(date)
         self.value_widgets[2].setText(location)
         # self.date_label.adjustSize()
@@ -63,7 +66,6 @@ class Popup(QDialog):
 
     def _build_UI(self):
         layout = QGridLayout(self)
-        self.setLayout(layout)
         self.value_widgets = []
 
         # create labels and empty values
