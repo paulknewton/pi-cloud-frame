@@ -6,7 +6,7 @@ import yaml
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QDialog, QLabel, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 import photo_utils
 from media_players import VideoPlayer, PhotoPlayer
@@ -21,20 +21,22 @@ class Popup(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.filename_label = None
-        self.date_label = None
+        self.labels = ["Filename:", "Date:", "Location:"]   # static labels
+        # list of QLabel widgets, each corresponding to a static label
+        self.value_widgets = None
         self._build_UI()
 
     def show_image_details(self, filename, exif_tags):
         logger.debug("exif tags: %s", exif_tags)
 
         logger.info("Filename: %s", filename)
+        self.value_widgets[0].setText(filename)
 
         # extract EXIF data (if any)
         date = location = "<unknown>"
         long_ref = long = lat_ref = lat = location = ""
         if "EXIF DateTimeOriginal" in exif_tags.keys():
-            date = exif_tags["EXIF DateTimeOriginal"]
+            date = str(exif_tags["EXIF DateTimeOriginal"])
 
         if "GPS GPSLatitudeRef" in exif_tags.keys():
             lat_ref = exif_tags["GPS GPSLatitudeRef"]
@@ -54,17 +56,24 @@ class Popup(QDialog):
             long_d, long_m, long_s = tuple(long.values)
             location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den, lat_ref, long_d.num / long_d.den, long_m.num / long_m.den, long_s.num / long_s.den, long_ref)
 
-        self.date_label.setText("Filename: %s\nDate: %s\nLocation: %s" % (filename, date, location))
-        self.date_label.adjustSize()
+        self.value_widgets[1].setText(date)
+        self.value_widgets[2].setText(location)
+        # self.date_label.adjustSize()
         self.show()
 
     def _build_UI(self):
-        layout = QVBoxLayout(self)
-        layout.setAlignment(Qt.AlignLeft)
+        layout = QGridLayout(self)
         self.setLayout(layout)
+        self.value_widgets = []
 
-        self.date_label = QLabel(self)
-        layout.addWidget(self.date_label)
+        # create labels and empty values
+        for y, label in enumerate(self.labels):
+            label_widget = QLabel(label, self)
+            label_widget.setAlignment(QtCore.Qt.AlignRight)
+            layout.addWidget(label_widget, y, 0)
+            value_widget = QLabel(self)
+            self.value_widgets.append(value_widget)
+            layout.addWidget(value_widget, y, 1)
 
         whatsapp_button = QPushButton("Send photo", self)
         whatsapp_button.clicked.connect(self.on_click)
