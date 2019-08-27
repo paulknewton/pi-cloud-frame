@@ -20,6 +20,8 @@ CONFIG_FILE = "config.yml"
 class Popup(QDialog):
     def __init__(self):
         super().__init__()
+        self.setWindowModality(Qt.NonModal)
+        self.setWindowFlag(Qt.FramelessWindowHint)
 
         self.labels = ["Filename:", "Date:", "Location:"]   # static labels
         # list of QLabel widgets, each corresponding to a static label
@@ -34,7 +36,7 @@ class Popup(QDialog):
 
         # extract EXIF data (if any)
         date = location = "<unknown>"
-        long_ref = long = lat_ref = lat = location = ""
+        long_ref = long = lat_ref = lat = ""
         if "EXIF DateTimeOriginal" in exif_tags.keys():
             date = str(exif_tags["EXIF DateTimeOriginal"])
 
@@ -112,8 +114,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def setup_general_config(self):
         frame_config = self._get_config_value(self.config, "frame", None)
         if not frame_config:
-            logger.error("Could not find section 'frame' in config file. Exiting")
-            sys.exit(1)
+            raise KeyError("Could not find section 'frame' in config file. Exiting")
 
         self.slideshow_delay = self._get_config_value(frame_config, "slideshow_delay", 5000)
         logger.info("Slideshow delay = %s", self.slideshow_delay)
@@ -128,10 +129,11 @@ class PhotoFrame(QtWidgets.QMainWindow):
         """
         players_config = self._get_config_value(self.config, "players", None)
         if not players_config:
-            logger.error("Could not find section 'players' in config file. Exiting")
-            sys.exit(1)
+            raise KeyError("Could not find section 'players' in config file. Exiting")
 
         self.players = []
+
+        # iterate through each entry, creating a corresponding media player
         for item in players_config:
             if players_config[item]["type"] == "photo_player":
                 player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
@@ -199,6 +201,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.stack = QtWidgets.QStackedWidget(self)
         for p in self.players:
             player_widget = p.get_main_widget()
+
+            # If the media player returns a widget, add it. Else create a dummy 'not implemented' widget
             if player_widget:
                 player_widget.setParent(self)
                 self.stack.addWidget(player_widget)
@@ -221,18 +225,32 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         :param mouse: the mouse event
         """
+
+        # close the popup (if open)
+        popup_closed = False
+        if self.popup and self.popup.isVisible():
+            self.popup.hide()
+            popup_closed = True
+
+        # get the width/height of the screen, and the mouse click lco-ords
         width, height = self.size().width(), self.size().height()
         x, y = mouse.pos().x(), mouse.pos().y()
 
+
+        # click on left/right borders = prev/next image
         if x >= width * 0.8:
             self.get_current_player().next()
         elif x <= width * 0.2:
             self.get_current_player().prev()
+
+        # click on the top/bottom borders = prev/next media player
         elif y >= height * 0.8:
             self.next_player()
         elif y <= height * 0.2:
             self.prev_player()
-        else:
+
+        # click in the centre = raise popup showing photo information
+        elif not popup_closed:
             logger.info("Open popup")
             if not self.popup:
                 self.popup = Popup()
@@ -246,18 +264,23 @@ class PhotoFrame(QtWidgets.QMainWindow):
         :param key: the pressed key
         """
         key_press = key.key()
-        if key_press == QtCore.Qt.Key_Escape:
+        if key_press == QtCore.Qt.Key_Escape:   # escape = exit
             self.close()
             sys.exit(0)
-        if key_press == QtCore.Qt.Key_Left:
+
+        if key_press == QtCore.Qt.Key_Left:     # left = prev image
             self.get_current_player().prev()
-        if key_press == QtCore.Qt.Key_Right:
+
+        if key_press == QtCore.Qt.Key_Right:    # right = next image
             self.get_current_player().next()
-        if key_press == QtCore.Qt.Key_Up:
+
+        if key_press == QtCore.Qt.Key_Up:       # up = next media player
             self.prev_player()
-        if key_press == 32:
+
+        if key_press == 32:                     # space = reload image list
             self.refresh_current_playlist()
-        if key_press == QtCore.Qt.Key_Down:
+
+        if key_press == QtCore.Qt.Key_Down:     # down = next player
             self.next_player()
 
     def refresh_current_playlist(self):
@@ -266,7 +289,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
 def exception_hook(exctype, value, traceback):
     """
-    Handle exceptions in the Qt application. Prevents exceptions being consumed silently
+    Handle exceptions in the Qt application. Prevents exceptions being consumed silently by Qt.
     :param exctype: the type of exception
     :param value: the exception contents
     :param traceback: the stack trace
@@ -304,8 +327,12 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
 
-    window = PhotoFrame(read_config())
-    window.raise_()
+    try:
+        window = PhotoFrame(read_config())
+        window.raise_()
+    except KeyError as e:
+        print(e)
+        sys.exit(1)
 
     app.exec_()
 
