@@ -80,7 +80,7 @@ class IcloudPhotos:
         if not photo:
             return False
 
-        if not orientation in ("portrait", "landscape"):
+        if orientation not in ("portrait", "landscape"):
             raise ValueError("orientation must be one of portrait or landscape")
 
         photo_orientation = photo._asset_record["fields"]["orientation"]["value"]
