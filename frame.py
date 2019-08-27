@@ -79,6 +79,7 @@ class Popup(QDialog):
         font_roman.setPointSize(self.font_size)
         font_bold = QFont()
         font_bold.setPointSize(self.font_size)
+        font_bold.setBold(True)
 
         # create labels and empty values
         for y, label in enumerate(self.labels):
