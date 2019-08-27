@@ -6,25 +6,26 @@ import yaml
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 import photo_utils
 from media_players import VideoPlayer, PhotoPlayer
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 CONFIG_FILE = "config.yml"
 
 
 class Popup(QDialog):
-    def __init__(self):
+    def __init__(self, font_size):
         super().__init__()
+        self.font_size = font_size
         self.setWindowModality(Qt.NonModal)
         self.setWindowFlag(Qt.FramelessWindowHint)
 
-        self.labels = ["Filename:", "Date:", "Location:"]   # static labels
+        self.labels = ["Filename:", "Date:", "Location:"]  # static labels
         # list of QLabel widgets, each corresponding to a static label
         self.value_widgets = None
         self._build_UI()
@@ -32,7 +33,7 @@ class Popup(QDialog):
     def show_image_details(self, filename, exif_tags):
         logger.debug("exif tags: %s", exif_tags)
 
-        logger.info("Filename: %s", filename)
+        logger.debug("Filename: %s", filename)
         self.value_widgets[0].setText(filename)
 
         # extract EXIF data (if any)
@@ -57,7 +58,9 @@ class Popup(QDialog):
         if all([lat, lat_ref, long, long_ref]):
             lat_d, lat_m, lat_s = tuple(lat.values)
             long_d, long_m, long_s = tuple(long.values)
-            location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den, lat_ref, long_d.num / long_d.den, long_m.num / long_m.den, long_s.num / long_s.den, long_ref)
+            location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den,
+                                                lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
+                                                long_s.num / long_s.den, long_ref)
 
             # reformat lines
             location = "\n".join(location.split(", "))
@@ -72,18 +75,20 @@ class Popup(QDialog):
         self.value_widgets = []
 
         # font used in popup dialog
-        font = QFont()
-        font.setPointSize(14)
+        font_roman = QFont()
+        font_roman.setPointSize(self.font_size)
+        font_bold = QFont()
+        font_bold.setPointSize(self.font_size)
 
         # create labels and empty values
         for y, label in enumerate(self.labels):
             label_widget = QLabel(label, self)
             label_widget.setAlignment(QtCore.Qt.AlignRight)
-            label_widget.setFont(font)
+            label_widget.setFont(font_bold)
             layout.addWidget(label_widget, y, 0)
 
             value_widget = QLabel(self)
-            value_widget.setFont(font)
+            value_widget.setFont(font_roman)
             layout.addWidget(value_widget, y, 1)
             self.value_widgets.append(value_widget)
 
@@ -102,6 +107,11 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         self.players = None
         self.current_player_index = 0
+
+        # read from config file
+        self.slideshow_delay = 0
+        self.media_folder = None
+        self.font_size = 0
 
         self.config = config
         self.setup_general_config()
@@ -124,10 +134,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         if not frame_config:
             raise KeyError("Could not find section 'frame' in config file. Exiting")
 
-        self.slideshow_delay = self._get_config_value(frame_config, "slideshow_delay", 5000)
-        logger.info("Slideshow delay = %s", self.slideshow_delay)
+        self.slideshow_delay = int(self._get_config_value(frame_config, "slideshow_delay", 5000))
+        logger.info("Slideshow delay = %d", self.slideshow_delay)
         self.media_folder = self._get_config_value(frame_config, "media_folder", "tmp")
         logger.info("Media folder = %s", self.media_folder)
+        self.font_size = int(self._get_config_value(frame_config, "font", "12"))
+        logger.info("Font size = %d", self.font_size)
 
     def setup_players(self):
         """
@@ -147,7 +159,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
                 player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
             if players_config[item]["type"] == "video_player":
                 player = VideoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
-                logger.info("Creating player %s", player.get_name())
+
+            logger.info("Creating player %s", player.get_name())
             self.players.append(player)
         self.current_player_index = 0
 
@@ -244,7 +257,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         width, height = self.size().width(), self.size().height()
         x, y = mouse.pos().x(), mouse.pos().y()
 
-
         # click on left/right borders = prev/next image
         if x >= width * 0.8:
             self.get_current_player().next()
@@ -259,9 +271,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # click in the centre = raise popup showing photo information
         elif not popup_closed:
-            logger.info("Open popup")
+            logger.debug("Open popup")
             if not self.popup:
-                self.popup = Popup()
+                self.popup = Popup(self.font_size)
             filename, exif = self.get_current_player().get_current_media_exif()
             self.popup.show_image_details(filename, exif)
 
@@ -272,26 +284,27 @@ class PhotoFrame(QtWidgets.QMainWindow):
         :param key: the pressed key
         """
         key_press = key.key()
-        if key_press == QtCore.Qt.Key_Escape:   # escape = exit
+        if key_press == QtCore.Qt.Key_Escape:  # escape = exit
             self.close()
             sys.exit(0)
 
-        if key_press == QtCore.Qt.Key_Left:     # left = prev image
+        if key_press == QtCore.Qt.Key_Left:  # left = prev image
             self.get_current_player().prev()
 
-        if key_press == QtCore.Qt.Key_Right:    # right = next image
+        if key_press == QtCore.Qt.Key_Right:  # right = next image
             self.get_current_player().next()
 
-        if key_press == QtCore.Qt.Key_Up:       # up = next media player
+        if key_press == QtCore.Qt.Key_Up:  # up = next media player
             self.prev_player()
 
-        if key_press == 32:                     # space = reload image list
+        if key_press == 32:  # space = reload image list
             self.refresh_current_playlist()
 
-        if key_press == QtCore.Qt.Key_Down:     # down = next player
+        if key_press == QtCore.Qt.Key_Down:  # down = next player
             self.next_player()
 
     def refresh_current_playlist(self):
+        logger.info("Refreshing media list for %s", self.get_current_player().get_name())
         self.get_current_player().refresh_media_list()
 
 
