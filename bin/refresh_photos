@@ -63,6 +63,12 @@ $TEST rm -f "$DOWNLOAD"/*
 echo "Downloading photos to $DOWNLOAD..."
 ./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" $ORIENTATION
 
+# if no files, exit
+if [ -n "$(ls -A .)" ]; then
+    echo No files downloaded. Exiting.
+    exit 1
+fi
+
 mkdir -p "$CROPPED"
 echo "Cleaning crop folder $CROPPED..."
 $TEST rm -f "$CROPPED"/*
