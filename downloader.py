@@ -18,7 +18,7 @@ def main():
         description="icloud photo frame")
     parser.add_argument("user", help="icloud user")
     parser.add_argument("password", help="password")
-    parser.add_argument("--output", help="folder to store downloaded photos", default="raw")
+    parser.add_argument("--output", help="folder to store downloaded photos", default="tmp/raw")
     parser.add_argument("--sample", help="number of photos to download", type=int, default=5)
     parser.add_argument("--album", help="icloud album to find photos", default="All Photos")
     parser.add_argument("--orientation", help="orientation of photos", choices=["portrait", "landscape"],
