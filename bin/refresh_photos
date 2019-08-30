@@ -21,18 +21,18 @@ SAMPLE_SIZE=$5
 
 case $3 in
     nixplay)
-        DOWNLOAD=/tmp/raw
-        CROPPED=/tmp/crop
+        DOWNLOAD=/tmp/pi-cloud-frame/raw
+        CROPPED=/tmp/pi-cloud-frame/crop
         OUT=media/nixplay
         ASPECT="16:9"
-        ORIENTATION=landscape
+        ORIENTATION="--orientation landscape"
         ;;
     pi)
         DOWNLOAD=/tmp/raw
         CROPPED=/tmp/crop
         OUT=media/photos
         ASPECT="800:480"
-        ORIENTATION=portrait
+        #ORIENTATION=portrait
         ;;
     *)
         echo Unknown profile $3. Exiting.
@@ -51,7 +51,8 @@ Crop folder: $CROPPED
 Output folder: $OUT
 icloud user: $ICLOUD_USER
 icloud album: $ALBUM
-# photos to download: $SAMPLE_SIZE
+photos to download: $SAMPLE_SIZE
+----------------
 EOF
 
 mkdir -p "$DOWNLOAD"
@@ -60,7 +61,7 @@ $TEST rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
 echo "Downloading photos to $DOWNLOAD..."
-./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" --orientation "$ORIENTATION"
+./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" $ORIENTATION
 
 mkdir -p "$CROPPED"
 echo "Cleaning crop folder $CROPPED..."

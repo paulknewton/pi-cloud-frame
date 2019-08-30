@@ -73,12 +73,15 @@ class IcloudPhotos:
         Check if the photo is the correct orientation.
 
         :param photo: the photo
-        :param orientation: portrait or landscape
-        :return: True if the photo orientation matches the specified orientation
+        :param orientation: portrait, landscape or None
+        :return: True if the photo orientation matches the specified orientation or if otientation is None
         """
 
         if not photo:
-            return False
+            raise ValueError("Photo is not defined")
+
+        if not orientation:
+            return True
 
         if orientation not in ("portrait", "landscape"):
             raise ValueError("orientation must be one of portrait or landscape")
@@ -103,7 +106,7 @@ class IcloudPhotos:
         Retrieve all photos from the specified icloud album. Only photos that are images and match the requested orientation are returned.
 
         @:param album: the icloud album to search
-        @:param orientation: the orientation of the photos (portrait or landscape)
+        @:param orientation: the orientation of the photos (portrait, landscape or None)
         @:return: a list of matching photos
         """
         eligible_photos = []

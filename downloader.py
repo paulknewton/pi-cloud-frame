@@ -22,7 +22,7 @@ def main():
     parser.add_argument("--sample", help="number of photos to download", type=int, default=5)
     parser.add_argument("--album", help="icloud album to find photos", default="All Photos")
     parser.add_argument("--orientation", help="orientation of photos", choices=["portrait", "landscape"],
-                        default="landscape")
+                        default=None)
     parser.add_argument("--list", help="list albums (no photo downloading)", action='store_true', default=False)
     args = parser.parse_args()
     print(args)
