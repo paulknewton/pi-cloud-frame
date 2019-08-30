@@ -11,9 +11,10 @@ from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 import photo_utils
 from media_players import VideoPlayer, PhotoPlayer
+from orientation import Compass
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 CONFIG_FILE = "config.yml"
 
@@ -58,9 +59,9 @@ class Popup(QDialog):
         if all([lat, lat_ref, long, long_ref]):
             lat_d, lat_m, lat_s = tuple(lat.values)
             long_d, long_m, long_s = tuple(long.values)
-            location = photo_utils.get_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den,
-                                                lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
-                                                long_s.num / long_s.den, long_ref)
+            location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den,
+                                                    lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
+                                                    long_s.num / long_s.den, long_ref)
 
             # reformat lines
             location = "\n".join(location.split(", "))
@@ -109,18 +110,25 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.players = None
         self.current_player_index = 0
 
-        # read from config file
+        # instance variables read from config file
         self.slideshow_delay = 0
         self.media_folder = None
         self.font_size = 0
+        self.rotation = False
 
+        # read from the config file
         self.config = config
         self.setup_general_config()
-        self.setup_players()
 
+        # setup an accelerometer if frame rotation enable
+        if self.rotation:
+            self.compass = Compass()
+        else:
+            self.compass = None
+
+        self.setup_players()
         self._build_UI()
         self.popup = None
-        self.showFullScreen()
 
         # start timer
         timer = QtCore.QTimer(self)
@@ -128,9 +136,13 @@ class PhotoFrame(QtWidgets.QMainWindow):
         timer.start(self.slideshow_delay)
 
         # go...
-        self.get_current_player().show_current_media()
+        self.showFullScreen()
+        self.get_current_player().next()
 
     def setup_general_config(self):
+        """
+        Read config values from config.yml file
+        """
         frame_config = self._get_config_value(self.config, "frame", None)
         if not frame_config:
             raise KeyError("Could not find section 'frame' in config file. Exiting")
@@ -141,6 +153,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         logger.info("Media folder = %s", self.media_folder)
         self.font_size = int(self._get_config_value(frame_config, "font", "12"))
         logger.info("Font size = %d", self.font_size)
+        self.rotation = bool(self._get_config_value(frame_config, "frame_rotation", False))
+        logger.info("Rotation = %s", self.rotation)
 
     def setup_players(self):
         """
@@ -157,9 +171,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # iterate through each entry, creating a corresponding media player
         for item in players_config:
             if players_config[item]["type"] == "photo_player":
-                player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
+                player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"], self.compass)
             if players_config[item]["type"] == "video_player":
-                player = VideoPlayer(item, self.media_folder + "/" + players_config[item]["folder"])
+                player = VideoPlayer(item, self.media_folder + "/" + players_config[item]["folder"], self.compass)
 
             logger.info("Creating player %s", player.get_name())
             self.players.append(player)

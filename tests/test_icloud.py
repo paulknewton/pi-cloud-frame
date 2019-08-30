@@ -64,12 +64,15 @@ def test_is_image_with_none_photos(mock_photo_record):
 
 def test_format_none():
     """
-    Test the format (portrait/landscape) function handles None images.
+    Test the format (portrait/landscape) function raises an exception with None images.
 
     :param mock_photo_record: mock photo setup by the Mock framework
     """
-    assert not IcloudPhotos.is_correct_format(None, "portrait")
-    assert not IcloudPhotos.is_correct_format(None, "landscape")
+    with pytest.raises(ValueError):
+        assert not IcloudPhotos.is_correct_format(None, "portrait")
+
+    with pytest.raises(ValueError):
+        assert not IcloudPhotos.is_correct_format(None, "landscape")
 
 
 def test_format_invalid_orientation():
