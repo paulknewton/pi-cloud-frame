@@ -110,7 +110,6 @@ class IcloudPhotos:
         @:return: a list of matching photos
         """
         eligible_photos = []
-        i = 1
         for i, photo in enumerate(self.api.photos.albums[album]):
             logger.debug("%d - Checking %s", i, photo.filename)
             # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
