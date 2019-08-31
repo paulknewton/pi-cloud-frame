@@ -109,6 +109,7 @@ class IcloudPhotos:
         @:param orientation: the orientation of the photos (portrait, landscape or None)
         @:return: a list of matching photos
         """
+        logger.debug("orientation = %s", orientation)
         eligible_photos = []
         for i, photo in enumerate(self.api.photos.albums[album]):
             logger.debug("%d - Checking %s", i, photo.filename)
@@ -116,6 +117,8 @@ class IcloudPhotos:
             if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, orientation):
                 logger.debug("Adding photo")
                 eligible_photos.append(photo)
+            else:
+                logger.debug("Skipping %s", photo.filename)
 
         return eligible_photos
 
