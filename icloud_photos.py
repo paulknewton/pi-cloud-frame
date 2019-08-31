@@ -64,7 +64,7 @@ class IcloudPhotos:
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 
-        logger.debug("[media_type %s OK]", media_type)
+        logger.info("[media_type %s OK]", media_type)
         return True
 
     @staticmethod
@@ -74,7 +74,7 @@ class IcloudPhotos:
 
         :param photo: the photo
         :param orientation: portrait, landscape or None
-        :return: True if the photo orientation matches the specified orientation or if otientation is None
+        :return: True if the photo orientation matches the specified orientation or orientation is undefined
         """
 
         if not photo:
@@ -90,15 +90,17 @@ class IcloudPhotos:
         width, height = photo.dimensions
 
         # rotate dimensions if needed
+        logger.info("EXIF orientation = %s", photo_orientation)
         if photo_orientation in (6, 8):
             width = photo.dimensions[1]
             height = photo.dimensions[0]
+        logger.info("dimensions = %d x %d", width, height)
 
         if (orientation == "landscape" and width <= height) or (orientation == "portrait" and width >= height):
-            logger.debug("[Invalid orientation %s - skip]", orientation)
+            logger.info("[Invalid orientation %s - skip]", orientation)
             return False
 
-        logger.debug("[orientation %s OK]", orientation)
+        logger.info("[orientation %s OK]", orientation)
         return True
 
     def get_all_photos(self, album, orientation):
@@ -109,16 +111,16 @@ class IcloudPhotos:
         @:param orientation: the orientation of the photos (portrait, landscape or None)
         @:return: a list of matching photos
         """
-        logger.debug("orientation = %s", orientation)
+        logger.info("orientation = %s", orientation)
         eligible_photos = []
         for i, photo in enumerate(self.api.photos.albums[album]):
-            logger.debug("%d - Checking %s", i, photo.filename)
+            logger.info("%d - Checking %s", i, photo.filename)
             # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
             if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, orientation):
-                logger.debug("Adding photo")
+                logger.info("Adding photo")
                 eligible_photos.append(photo)
             else:
-                logger.debug("Skipping %s", photo.filename)
+                logger.info("Skipping %s", photo.filename)
 
         return eligible_photos
 
@@ -130,9 +132,9 @@ class IcloudPhotos:
         :param photos: list of photos to download
         :param folder: the folder to store the photos locally
         """
-        for photo in photos:
+        for i, photo in enumerate(photos):
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
-                logger.info("[%s %s %s]", photo.filename, photo.dimensions,
+                logger.info("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
                             photo._asset_record["fields"]["orientation"]["value"])
                 data = photo.download().raw.read()
                 # cannot crop HEIC images with Pillow
