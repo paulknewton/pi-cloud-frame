@@ -40,16 +40,17 @@ def main():
         # get all photos in the photo frame album
         logger.info("Downloading photo list...")
         photos = api.get_all_photos(args.album, args.orientation)
-
-        # get a random sample to download
-        logger.info("Selecting random sample (%d from %d)", args.sample, len(photos))
-        photos_sample = photo_utils.get_sample(photos, args.sample)
-
-        #logger.info("Downloading photos to %s...", args.output)
-        #IcloudPhotos.download(photos_sample, args.output)
     except KeyError as e:
         print("Could not find album: ", e)
         sys.exit(1)
+
+    # get a random sample to download
+    logger.info("Selecting random sample (%d from %d)", args.sample, len(photos))
+    photos_sample = photo_utils.get_sample(photos, args.sample)
+
+    logger.info("Downloading photos to %s...", args.output)
+    IcloudPhotos.download(photos_sample, args.output)
+
 
 if __name__ == '__main__':
     main()

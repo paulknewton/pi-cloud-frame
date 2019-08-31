@@ -23,7 +23,7 @@ class IcloudPhotos:
         """
         api = PyiCloudService(user, password)
 
-        if api.requires_2sa:    # this attribute is added by the patched pyicloud at https://github.com/picklepete/pyicloud.git
+        if api.requires_2sa:  # this attribute is added by the patched pyicloud at https://github.com/picklepete/pyicloud.git
             import click
             print("Two-step authentication required. Your trusted devices are:")
 
@@ -68,55 +68,62 @@ class IcloudPhotos:
         return True
 
     @staticmethod
-    def is_correct_format(photo, orientation):
+    def is_correct_format(photo, requested_orientation):
         """
         Check if the photo is the correct orientation.
 
+        :type photo: pyicloud.PhotoAsset
         :param photo: the photo
-        :param orientation: portrait, landscape or None
+        :param requested_orientation: portrait, landscape or None
         :return: True if the photo orientation matches the specified orientation or orientation is undefined
         """
 
         if not photo:
             raise ValueError("Photo is not defined")
 
-        if not orientation:
+        if not requested_orientation:
             return True
 
-        if orientation not in ("portrait", "landscape"):
-            raise ValueError("orientation must be one of portrait or landscape")
+        if requested_orientation not in ("portrait", "landscape"):
+            raise ValueError("requested_orientation must be one of portrait or landscape")
 
-        photo_orientation = photo._asset_record["fields"]["orientation"]["value"]
+        exif_orientation = photo._asset_record["fields"]["orientation"]["value"]
         width, height = photo.dimensions
 
         # rotate dimensions if needed
-        logger.info("EXIF orientation = %s", photo_orientation)
-        if photo_orientation in (6, 8):
+        logger.info("EXIF orientation = %s", exif_orientation)
+        if exif_orientation in (6, 8):
             width = photo.dimensions[1]
             height = photo.dimensions[0]
         logger.info("dimensions = %d x %d", width, height)
 
-        if (orientation == "landscape" and width <= height) or (orientation == "portrait" and width >= height):
-            logger.info("[Invalid orientation %s - skip]", orientation)
+        # is photo portrait or landscape?
+        if width <= height:
+            photo_orientation = "portrait"
+        else:
+            photo_orientation = "landscape"
+
+        if requested_orientation != photo_orientation:
+            logger.info("[Invalid requested_orientation %s - skip]", photo_orientation)
             return False
 
-        logger.info("[orientation %s OK]", orientation)
+        logger.info("[requested_orientation %s OK]", photo_orientation)
         return True
 
-    def get_all_photos(self, album, orientation):
+    def get_all_photos(self, album, requested_orientation):
         """
-        Retrieve all photos from the specified icloud album. Only photos that are images and match the requested orientation are returned.
+        Retrieve all photos from the specified icloud album. Only photos that are images and match the requested requested_orientation are returned.
 
         @:param album: the icloud album to search
-        @:param orientation: the orientation of the photos (portrait, landscape or None)
+        @:param requested_orientation: the requested_orientation of the photos (portrait, landscape or None)
         @:return: a list of matching photos
         """
-        logger.info("orientation = %s", orientation)
+        logger.info("requested_orientation = %s", requested_orientation)
         eligible_photos = []
         for i, photo in enumerate(self.api.photos.albums[album]):
             logger.info("%d - Checking %s", i, photo.filename)
             # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
-            if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, orientation):
+            if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, requested_orientation):
                 logger.info("Adding photo")
                 eligible_photos.append(photo)
             else:

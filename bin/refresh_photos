@@ -25,7 +25,7 @@ case $3 in
         CROPPED=tmp/crop
         OUT=media/nixplay
         ASPECT="16:9"
-        #ORIENTATION="--orientation landscape"
+        ORIENTATION="--orientation landscape"
         ;;
     pi)
         DOWNLOAD=tmp/raw
