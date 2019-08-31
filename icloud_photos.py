@@ -72,7 +72,7 @@ class IcloudPhotos:
         """
         Check if the photo is the correct orientation.
 
-        :type photo: pyicloud.PhotoAsset
+        :type photo: pyicloud.services.photos.PhotoAsset
         :param photo: the photo
         :param requested_orientation: portrait, landscape or None
         :return: True if the photo orientation matches the specified orientation or orientation is undefined
@@ -87,7 +87,8 @@ class IcloudPhotos:
         if requested_orientation not in ("portrait", "landscape"):
             raise ValueError("requested_orientation must be one of portrait or landscape")
 
-        exif_orientation = photo._asset_record["fields"]["orientation"]["value"]
+        # exif_orientation = photo._asset_record["fields"]["orientation"]["value"]
+        exif_orientation = photo._master_record["fields"]["originalOrientation"]["value"]
         width, height = photo.dimensions
 
         # rotate dimensions if needed
@@ -142,7 +143,7 @@ class IcloudPhotos:
         for i, photo in enumerate(photos):
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
                 logger.info("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
-                            photo._asset_record["fields"]["orientation"]["value"])
+                            photo._master_record["fields"]["originalOrientation"]["value"])
                 data = photo.download().raw.read()
                 # cannot crop HEIC images with Pillow
                 # crop_image(PIL.Image.open(os.io.BytesIO(data)), float(16 / 9))
