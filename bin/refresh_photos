@@ -86,10 +86,11 @@ $TEST rm -f "$CROPPED"/*
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
-for i in "$ROOT/$DOWNLOAD"/*;
+for SRC_FILE in "$ROOT/$DOWNLOAD"/*;
 do
-    echo Cropping `basename "$i"`
-    $TEST aspectcrop -a "$ASPECT" "$i" `basename "$i"`
+    OUT_FILE=`basename "$SRC_FILE" | sed -e 's/ /_/g'`
+    echo Cropping $OUT_FILE
+    $TEST aspectcrop -a "$ASPECT" "$SRC_FILE" "$OUT_FILE"
 done
 cd "$ROOT"
 
