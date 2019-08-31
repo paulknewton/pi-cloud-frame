@@ -21,15 +21,15 @@ SAMPLE_SIZE=$5
 
 case $3 in
     nixplay)
-        DOWNLOAD=/tmp/pi-cloud-frame/raw
-        CROPPED=/tmp/pi-cloud-frame/crop
+        DOWNLOAD=tmp/raw
+        CROPPED=tmp/crop
         OUT=media/nixplay
         ASPECT="16:9"
-        ORIENTATION="--orientation landscape"
+        #ORIENTATION="--orientation landscape"
         ;;
     pi)
-        DOWNLOAD=/tmp/raw
-        CROPPED=/tmp/crop
+        DOWNLOAD=tmp/raw
+        CROPPED=tmp/crop
         OUT=media/photos
         ASPECT="800:480"
         #ORIENTATION=portrait
@@ -64,9 +64,9 @@ echo "Downloading photos to $DOWNLOAD..."
 ./downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" $ORIENTATION
 
 # if no files, exit
-if [ -n "$(ls -A .)" ]; then
+if [ -n '$(ls -A "$DOWNLOAD")' ]; then
     echo No files downloaded. Exiting.
-    exit 1
+#    exit 1
 fi
 
 mkdir -p "$CROPPED"
@@ -87,8 +87,8 @@ echo "Cleaning download folder $DOWNLOAD..."
 $TEST rm -f "$DOWNLOAD"/*
 
 mkdir -p "$OUT"
-echo "Cleaning final output  folder $OUT..."
-$TEST rm -f "$OUT"/*
+#echo "Cleaning final output  folder $OUT..."
+#$TEST rm -f "$OUT"/*
 
 # convert the new photos
 echo "Converting photos in $CROPPED to $OUT..."
