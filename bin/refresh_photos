@@ -78,7 +78,7 @@ echo "Cropping photos from $DOWNLOAD to $CROPPED..."
 cd "$CROPPED"
 for i in "$ROOT/$DOWNLOAD"/*;
 do
-    echo `basename "$i"`
+    echo Cropping `basename "$i"`
     $TEST aspectcrop -a "$ASPECT" "$i" `basename "$i"`
 done
 cd "$ROOT"
