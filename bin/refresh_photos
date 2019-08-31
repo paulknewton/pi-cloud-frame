@@ -20,13 +20,23 @@ ALBUM=$4
 SAMPLE_SIZE=$5
 
 case $3 in
-    nixplay)
+    # original nixplay frame
+    nixplay1)
         DOWNLOAD=tmp/raw
         CROPPED=tmp/crop
-        OUT=media/nixplay
+        OUT=media/nixplay1
         ASPECT="16:9"
         ORIENTATION="--orientation landscape"
         ;;
+    # nixplay "Smart Photo" frame
+    nixplay2)
+        DOWNLOAD=tmp/raw
+        CROPPED=tmp/crop
+        OUT=media/nixplay2
+        ASPECT="16:10"
+        ORIENTATION="--orientation portrait"
+        ;;
+    # raspberry pi with official display
     pi)
         DOWNLOAD=tmp/raw
         CROPPED=tmp/crop
