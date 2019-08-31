@@ -92,11 +92,11 @@ class IcloudPhotos:
         width, height = photo.dimensions
 
         # rotate dimensions if needed
-        logger.info("EXIF orientation = %s", exif_orientation)
+        logger.debug("EXIF orientation = %s", exif_orientation)
         if exif_orientation in (6, 8):
             width = photo.dimensions[1]
             height = photo.dimensions[0]
-        logger.info("dimensions = %d x %d", width, height)
+        logger.debug("dimensions = %d x %d", width, height)
 
         # is photo portrait or landscape?
         if width <= height:
@@ -105,7 +105,7 @@ class IcloudPhotos:
             photo_orientation = "landscape"
 
         if requested_orientation != photo_orientation:
-            logger.info("[Invalid photo orientation (%s) - skip]", photo_orientation)
+            logger.debug("[Invalid photo orientation (%s) - skip]", photo_orientation)
             return False
 
         logger.info("[requested_orientation %s OK]", photo_orientation)
@@ -122,13 +122,13 @@ class IcloudPhotos:
         logger.info("requested_orientation = %s", requested_orientation)
         eligible_photos = []
         for i, photo in enumerate(self.api.photos.albums[album]):
-            logger.info("%d - Checking %s", i, photo.filename)
+            logger.debug("%d - Checking %s", i, photo.filename)
             # asset_types.add(photo._master_record["fields"]["itemType"]["value"])
             if IcloudPhotos.is_image(photo) and IcloudPhotos.is_correct_format(photo, requested_orientation):
-                logger.info("Adding photo")
+                logger.debug("Adding photo")
                 eligible_photos.append(photo)
             else:
-                logger.info("Skipping %s", photo.filename)
+                logger.debug("Skipping %s", photo.filename)
 
         return eligible_photos
 
