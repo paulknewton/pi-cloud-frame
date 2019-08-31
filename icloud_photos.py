@@ -105,7 +105,7 @@ class IcloudPhotos:
             photo_orientation = "landscape"
 
         if requested_orientation != photo_orientation:
-            logger.info("[Invalid requested_orientation %s - skip]", photo_orientation)
+            logger.info("[Invalid photo orientation (%s) - skip]", photo_orientation)
             return False
 
         logger.info("[requested_orientation %s OK]", photo_orientation)
