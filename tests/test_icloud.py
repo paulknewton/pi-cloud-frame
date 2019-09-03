@@ -88,7 +88,8 @@ def test_format_invalid_orientation():
 
 @mock.patch("test_icloud.DummyPhoto.dimensions", new_callable=PropertyMock)
 @mock.patch("test_icloud.DummyPhoto._asset_record", new_callable=PropertyMock)
-def test_format(mock_photo_asset_record, mock_photo_dimensions):
+@mock.patch("test_icloud.DummyPhoto._master_record", new_callable=PropertyMock)
+def test_format(mock_photo_master_record, mock_photo_asset_record, mock_photo_dimensions):
     """
     Test photo is recognised corrctly as portrait vs. landscape (including when rotated).
 
@@ -96,22 +97,26 @@ def test_format(mock_photo_asset_record, mock_photo_dimensions):
     """
     photo = DummyPhoto()
 
+    mock_photo_master_record.return_value = {"fields": {"originalOrientation": {"value": 3}}}
     mock_photo_asset_record.return_value = {"fields": {"orientation": {"value": 3}}}
     mock_photo_dimensions.return_value = (50, 100)
     assert IcloudPhotos.is_correct_format(photo, "portrait")
     assert not IcloudPhotos.is_correct_format(photo, "landscape")
 
+    mock_photo_master_record.return_value = {"fields": {"originalOrientation": {"value": 3}}}
     mock_photo_asset_record.return_value = {"fields": {"orientation": {"value": 3}}}
     mock_photo_dimensions.return_value = (100, 50)
     assert not IcloudPhotos.is_correct_format(photo, "portrait")
     assert IcloudPhotos.is_correct_format(photo, "landscape")
 
     # photo is rotated so dimensions needs to be swapped
+    mock_photo_master_record.return_value = {"fields": {"originalOrientation": {"value": 6}}}
     mock_photo_asset_record.return_value = {"fields": {"orientation": {"value": 6}}}
     mock_photo_dimensions.return_value = (100, 50)
     assert IcloudPhotos.is_correct_format(photo, "portrait")
     assert not IcloudPhotos.is_correct_format(photo, "landscape")
 
+    mock_photo_master_record.return_value = {"fields": {"originalOrientation": {"value": 8}}}
     mock_photo_asset_record.return_value = {"fields": {"orientation": {"value": 8}}}
     mock_photo_dimensions.return_value = (100, 50)
     assert IcloudPhotos.is_correct_format(photo, "portrait")
