@@ -1,6 +1,9 @@
 class Compass:
+    """
+    Sensor to detect rotation of a frame
+    """
     def __init__(self):
-        self._angle = 0     # default - no rotation (landscape)
+        self._compass_angle = -90     # default - no rotation (landscape)
 
     def get_rotation(self):
         """
@@ -8,8 +11,7 @@ class Compass:
         The angle is not rounded.
         :return: the angle
         """
-        # TODO: read angle from accelerometer
-        return self._angle
+        return self._compass_angle
 
     def get_rotation_simple(self):
         """

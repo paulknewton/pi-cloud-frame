@@ -132,8 +132,11 @@ class AbstractMediaPlayer(ABC):
         self.refresh_media_list()
 
         invalid_media = True
-        while invalid_media:
-            # TODO: prevent looping forever in case no images
+        ctr = 0
+        while invalid_media and ctr < len(self._media_list):
+            # prevent looping forever in case no images match
+            logger.debug("ctr = %d", ctr)
+
             logger.debug("_current_media_index = %s", self._current_media_index)
             logger.debug("length _media_list = %d", len(self._media_list))
             if self._current_media_index is None or is_boundary(self._current_media_index, self._media_list):
@@ -142,7 +145,9 @@ class AbstractMediaPlayer(ABC):
             else:
                 logger.debug("Moving to neighbouring media item")
                 self._current_media_index = move(self._current_media_index)
+
             invalid_media = not self.show_current_media()
+            ctr += 1
 
 
 class VideoPlayer(AbstractMediaPlayer):
@@ -154,7 +159,6 @@ class VideoPlayer(AbstractMediaPlayer):
         pass
 
     def show_current_media(self):
-        # TODO implement video player
         pass
 
 
@@ -173,6 +177,8 @@ class PhotoPlayer(AbstractMediaPlayer):
             self.main_window.setText("Media Player %s: No media to show" % self.get_name())
             return
 
+        angle_to_rotate_photo = 0
+
         # load image from the file
         image_filename = self._media_list[self._current_media_index]
         logger.debug("Loading image %s", image_filename)
@@ -181,24 +187,25 @@ class PhotoPlayer(AbstractMediaPlayer):
         if self.compass:
 
             is_portrait_frame_check = self.compass.is_portrait_frame()
-            is_portrait_image_check = photo_utils.is_portrait(image_filename)
+            is_portrait_image_check = photo_utils.is_file_portrait(image_filename)
             logger.debug("Is frame in portrait mode? %s", is_portrait_frame_check)
             logger.debug("Is image in portrait mode? %s", is_portrait_image_check)
 
             # check compatibility of frame with photo rotation (must be the same)
-            if not (is_portrait_frame_check == is_portrait_image_check):
+            if is_portrait_frame_check != is_portrait_image_check:
                 logging.info("Frame rotation does not match photo rotation. Skipping %s.", image_filename)
                 self.main_window.setText("Frame rotation does not match photo rotation. Skipping %s." % image_filename)
                 return False
 
             # if we get here, the photo is compatible
             logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
-            logger.info("TODO: implement rotation")
-            # image = image.transformed(QtGui.QTransform().rotate(frame_direction))
+            angle_to_rotate_photo = -self.compass.get_rotation_simple()
 
         # if we get here, we can show it
+        # TODO: rotate photo based on EXIF orientation
         image = QtGui.QImage(image_filename)
         if image:
+            image = image.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
             pmap = QtGui.QPixmap.fromImage(image)
             self.main_window.setPixmap(pmap.scaled(
                 self.get_main_widget().size(),

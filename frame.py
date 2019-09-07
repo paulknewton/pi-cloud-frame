@@ -14,7 +14,7 @@ from media_players import VideoPlayer, PhotoPlayer
 from orientation import Compass
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 CONFIG_FILE = "config.yml"
 

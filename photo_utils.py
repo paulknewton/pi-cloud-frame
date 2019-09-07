@@ -1,7 +1,8 @@
 import logging
 import random
 
-from PyQt5 import QtGui
+import exifread
+from PyQt5.QtGui import QImage
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 
@@ -41,6 +42,18 @@ def crop_image(image, aspect_ratio):
 
 
 def get_gps_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref):
+    """
+    Lookup address for a set of GPD co-ordinates in DMS form
+    :param lat_d: latitude (degrees)
+    :param lat_m: latitude (minutes)
+    :param lat_s: latitude (seconds)
+    :param lat_ref: latitude reference (N/S)
+    :param long_d: longitude (degrees)
+    :param long_m: longitude (minutes)
+    :param long_s: longitude (seconds)
+    :param long_ref: longitude reference (E/W)
+    :return:
+    """
     logger.debug("Checking gps location: %s", locals())
     geolocator = Nominatim(user_agent="pi-cloud-frame")
     location_point = Point(
@@ -50,25 +63,76 @@ def get_gps_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_
     return location.address
 
 
-def is_portrait(image_filename):
+def is_file_portrait(image_filename):
     """
     Check if an image is in portrait mode.
     :param image_filename: a QImage image
     :return: True if portrait mode, False if landscape mode or unknown
     """
-    image = QtGui.QImage(image_filename)
-    # TODO: handle EXIF rotation data in images
-    width = image.width()
-    height = image.height()
-    _is_portrait = height > width
-    logger.debug("Width = %d, Height = %d. Portrait mode: %s", width, height, _is_portrait)
-    return _is_portrait
+    image = QImage(image_filename)
+
+    with open(image_filename, 'rb') as f:
+        exif_tags = exifread.process_file(f, details=False)
+        logger.info("EXIF data: %s", exif_tags.keys())
+
+        try:
+            # TODO: use correct EXIF tag to determine orientation
+            exif_rotation = exif_tags["EXIF Orientation"]
+            return is_portrait(image.width(), image.height(), exif_orientation)
+        except KeyError:
+            return is_portrait(image.width(), image.height())
 
 
-def is_landscape(image_filename):
+def is_file_landscape(image_filename):
     """
     Check if an image is in landscape mode.
-    :param image_filename: a QImage image
+    :param image_filename: the location of the image
     :return: True if landscape mode, False if portrait mode or unknown
     """
-    return not is_portrait(image_filename)
+    return not is_file_portrait(image_filename)
+
+
+def get_exif_rotation_angle(exif_orientation):
+    """
+    Check if EXIF rotiation angle signifies portrait or lansdscape.
+    :param exif_orientation: numeric EXIF rotation value
+    :return: angle of rotation (0-270)
+    """
+    rotation_values = {
+        1: 0,
+        6: 90,
+        3: 180,
+        8: 270
+    }
+    return rotation_values[exif_orientation]
+
+
+def is_portrait(width, height, exif_orientation=1):
+    """
+    Check if an image is in portrait mode, taking into account the EXIF rotation setting.
+    :param width: the width of the image
+    :param height: the height of the image
+    :param exif_orientation: the rotation flag
+    :return: True if portrait mode, False if landscape mode or unknown
+    """
+    logger.debug("EXIF orientation = %s; width = %d; height = %d", exif_orientation, width, height)
+
+    # swap width/height based on EXIF rotation tags
+    if get_exif_rotation_angle(exif_orientation) in (0, 180):  # landscape
+        exif_width, exif_height = width, height
+    else:  # portrait
+        exif_width, exif_height = height, width
+
+    # is photo portrait or landscape?
+    return exif_width <= exif_height
+
+
+def is_landscape(width, height, exif_orientation=1):
+    """
+    Check if an image is in landscape mode, taking into account the EXIF rotation setting.
+    :param width: the width of the image
+    :param height: the height of the image
+    :param exif_orientation: the rotation flag
+    :return: True if landscape mode, False if portrait mode or unknown
+    """
+    return not is_portrait(width, height, exif_orientation)

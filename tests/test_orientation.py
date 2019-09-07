@@ -11,12 +11,12 @@ def test_portrait_check():
     landscape_angles = [0, 180, -180, 360]
 
     for angle in portrait_angles:
-        compass._angle = angle
+        compass._compass_angle = angle
         assert compass.is_portrait_frame()
         assert not compass.is_landscape_frame()
 
     for angle in landscape_angles:
-        compass._angle = angle
+        compass._compass_angle = angle
         assert compass.is_landscape_frame()
         assert not compass.is_portrait_frame()
 
@@ -27,114 +27,114 @@ def test_compass_rounded():
     """
     compass = orientation.Compass()
 
-    compass._angle = 10
+    compass._compass_angle = 10
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 40
+    compass._compass_angle = 40
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 44
+    compass._compass_angle = 44
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 45
+    compass._compass_angle = 45
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 46
+    compass._compass_angle = 46
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 89
+    compass._compass_angle = 89
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 90
+    compass._compass_angle = 90
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 91
+    compass._compass_angle = 91
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 134
+    compass._compass_angle = 134
     assert compass.get_rotation_simple() == 90
 
-    compass._angle = 135
+    compass._compass_angle = 135
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 136
+    compass._compass_angle = 136
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 179
+    compass._compass_angle = 179
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 180
+    compass._compass_angle = 180
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 181
+    compass._compass_angle = 181
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 224
+    compass._compass_angle = 224
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = 225
+    compass._compass_angle = 225
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = 226
+    compass._compass_angle = 226
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = 269
+    compass._compass_angle = 269
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = 270
+    compass._compass_angle = 270
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = 271
+    compass._compass_angle = 271
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = 314
+    compass._compass_angle = 314
     assert compass.get_rotation_simple() == 270
 
     # all angles are modulo 360
-    compass._angle = 315
+    compass._compass_angle = 315
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 316
+    compass._compass_angle = 316
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 359
+    compass._compass_angle = 359
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 360
+    compass._compass_angle = 360
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 361
+    compass._compass_angle = 361
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = 0
+    compass._compass_angle = 0
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = -1
+    compass._compass_angle = -1
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = -44
+    compass._compass_angle = -44
     assert compass.get_rotation_simple() == 0
 
-    compass._angle = -45
+    compass._compass_angle = -45
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -46
+    compass._compass_angle = -46
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -89
+    compass._compass_angle = -89
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -90
+    compass._compass_angle = -90
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -91
+    compass._compass_angle = -91
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -134
+    compass._compass_angle = -134
     assert compass.get_rotation_simple() == 270
 
-    compass._angle = -135
+    compass._compass_angle = -135
     assert compass.get_rotation_simple() == 180
 
-    compass._angle = -136
+    compass._compass_angle = -136
     assert compass.get_rotation_simple() == 180

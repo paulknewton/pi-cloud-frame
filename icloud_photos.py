@@ -4,6 +4,8 @@ import sys
 
 from pyicloud import PyiCloudService
 
+import photo_utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -91,15 +93,7 @@ class IcloudPhotos:
         exif_orientation = photo._master_record["fields"]["originalOrientation"]["value"]
         width, height = photo.dimensions
 
-        # rotate dimensions if needed
-        logger.debug("EXIF orientation = %s", exif_orientation)
-        if exif_orientation in (6, 8):
-            width = photo.dimensions[1]
-            height = photo.dimensions[0]
-        logger.debug("dimensions = %d x %d", width, height)
-
-        # is photo portrait or landscape?
-        if width <= height:
+        if photo_utils.is_portrait(width, height, exif_orientation):
             photo_orientation = "portrait"
         else:
             photo_orientation = "landscape"
