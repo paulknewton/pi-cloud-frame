@@ -272,6 +272,10 @@ class PhotoFrame(QtWidgets.QMainWindow):
         width, height = self.size().width(), self.size().height()
         x, y = mouse.pos().x(), mouse.pos().y()
 
+        # flip click areas if frame is rotated
+        if self.compass and self.compass.is_portrait_frame():
+            x, y = y, x
+
         # click on left/right borders = prev/next image
         if x >= width * 0.8:
             self.get_current_player().next()
@@ -367,7 +371,7 @@ def main():
         window = PhotoFrame(read_config())
         window.raise_()
     except KeyError as e:
-        print(e)
+        print("Error setting up frame: ", e)
         sys.exit(1)
 
     app.exec_()

@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtGui import QImage
 
 import photo_utils
 
@@ -192,7 +193,11 @@ class PhotoPlayer(AbstractMediaPlayer):
             is_portrait_frame_check = self.compass.is_portrait_frame()
 
             image = QImage(image_filename)
-            is_portrait_image_check = photo_utils.is_portrait(image.width(), image.height(), exif_orientation)
+            if exif_orientation:
+                is_portrait_image_check = photo_utils.is_portrait(image.width(), image.height(), exif_orientation)
+            else:
+                is_portrait_image_check = photo_utils.is_portrait(image.width(), image.height())
+
             logger.debug("Is frame in portrait mode? %s", is_portrait_frame_check)
             logger.debug("Is image in portrait mode? %s", is_portrait_image_check)
 
@@ -209,8 +214,10 @@ class PhotoPlayer(AbstractMediaPlayer):
             angle_to_rotate_photo = -self.compass.get_rotation_simple()
 
         # rotate the photo based on the photo EXIF rotation
-        logger.debug("Photo rotated by %d", exif_rotation)
-        angle_to_rotate_photo = angle_to_rotate_photo - exif_rotation
+        if exif_orientation:
+            photo_rotation = photo_utils.get_exif_rotation_angle(exif_orientation)
+            logger.debug("Photo rotated by %d", photo_rotation)
+            angle_to_rotate_photo = angle_to_rotate_photo - photo_rotation
 
         image = QtGui.QImage(image_filename)
         if image:
