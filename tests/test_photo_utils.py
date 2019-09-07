@@ -85,12 +85,12 @@ def test_invalid_exif_rotation():
             assert pu.get_exif_rotation_angle(i)
 
 
-def test_files_are_portrait_or_landscape():
+def test_no_exif_orientation():
     portrait_file = "portrait_no_exif.jpg"
 
-    assert pu.is_file_portrait(portrait_file)
-    assert not pu.is_file_landscape(portrait_file)
+    assert pu.get_file_exif_orientation(portrait_file) is None
 
-    landscape_file = "landscape_no_exif.jpg"
-    assert pu.is_file_landscape(landscape_file)
-    assert not pu.is_file_portrait(landscape_file)
+
+def test_exif_orientation():
+    # TODO unit test for EXIF orientation
+    pass

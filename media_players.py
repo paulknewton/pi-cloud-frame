@@ -183,11 +183,16 @@ class PhotoPlayer(AbstractMediaPlayer):
         image_filename = self._media_list[self._current_media_index]
         logger.debug("Loading image %s", image_filename)
 
+        # we alwways need this (even to discard incompatible photos) so check now
+        exif_orientation = photo_utils.get_file_exif_orientation(image_filename)
+
         # if frame rotation detection is supported, skip portrait photos if frame is in landscape mode (and vice versa)
         if self.compass:
 
             is_portrait_frame_check = self.compass.is_portrait_frame()
-            is_portrait_image_check = photo_utils.is_file_portrait(image_filename)
+
+            image = QImage(image_filename)
+            is_portrait_image_check = photo_utils.is_portrait(image.width(), image.height(), exif_orientation)
             logger.debug("Is frame in portrait mode? %s", is_portrait_frame_check)
             logger.debug("Is image in portrait mode? %s", is_portrait_image_check)
 
@@ -198,11 +203,15 @@ class PhotoPlayer(AbstractMediaPlayer):
                 return False
 
             # if we get here, the photo is compatible
+
+            # rotate the photo based on the frame orientation
             logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
             angle_to_rotate_photo = -self.compass.get_rotation_simple()
 
-        # if we get here, we can show it
-        # TODO: rotate photo based on EXIF orientation
+        # rotate the photo based on the photo EXIF rotation
+        logger.debug("Photo rotated by %d", exif_rotation)
+        angle_to_rotate_photo = angle_to_rotate_photo - exif_rotation
+
         image = QtGui.QImage(image_filename)
         if image:
             image = image.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))

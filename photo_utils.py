@@ -2,7 +2,6 @@ import logging
 import random
 
 import exifread
-from PyQt5.QtGui import QImage
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 
@@ -63,33 +62,21 @@ def get_gps_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_
     return location.address
 
 
-def is_file_portrait(image_filename):
+def get_file_exif_orientation(image_filename):
     """
-    Check if an image is in portrait mode.
-    :param image_filename: a QImage image
-    :return: True if portrait mode, False if landscape mode or unknown
+    Get the EXIF orientation from a photo file
+    :param image_filename: the location of the image
+    :return: the value corresponding to the EXIF orientation tag (None if missing)
     """
-    image = QImage(image_filename)
-
     with open(image_filename, 'rb') as f:
         exif_tags = exifread.process_file(f, details=False)
         logger.info("EXIF data: %s", exif_tags.keys())
 
         try:
             # TODO: use correct EXIF tag to determine orientation
-            exif_rotation = exif_tags["EXIF Orientation"]
-            return is_portrait(image.width(), image.height(), exif_orientation)
+            return exif_tags["EXIF Orientation"]
         except KeyError:
-            return is_portrait(image.width(), image.height())
-
-
-def is_file_landscape(image_filename):
-    """
-    Check if an image is in landscape mode.
-    :param image_filename: the location of the image
-    :return: True if landscape mode, False if portrait mode or unknown
-    """
-    return not is_file_portrait(image_filename)
+            return None
 
 
 def get_exif_rotation_angle(exif_orientation):
