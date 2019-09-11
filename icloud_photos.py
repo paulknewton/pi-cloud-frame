@@ -47,6 +47,13 @@ class IcloudPhotos:
 
         return api
 
+
+    @staticmethod
+    def _get_media_type(photo):
+        # root, ext = os.path.splitext(photo.filename)
+        # media_type = ext.upper()
+        return photo._master_record["fields"]["itemType"]["value"]
+
     @staticmethod
     def is_image(photo):
         """
@@ -59,14 +66,13 @@ class IcloudPhotos:
         if not photo:
             return False
 
-        # root, ext = os.path.splitext(photo.filename)
-        # media_type = ext.upper()
-        media_type = photo._master_record["fields"]["itemType"]["value"]
-        if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.tiff"]):
+        media_type = IcloudPhotos._get_media_type(photo)
+
+        if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]):
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 
-        logger.info("[media_type %s OK]", media_type)
+        logger.debug("[media_type %s OK]", media_type)
         return True
 
     @staticmethod
@@ -102,7 +108,7 @@ class IcloudPhotos:
             logger.debug("[Invalid photo orientation (%s) - skip]", photo_orientation)
             return False
 
-        logger.info("[requested_orientation %s OK]", photo_orientation)
+        logger.debug("[requested_orientation %s OK]", photo_orientation)
         return True
 
     def get_all_photos(self, album, requested_orientation):
@@ -113,7 +119,7 @@ class IcloudPhotos:
         @:param requested_orientation: the requested_orientation of the photos (portrait, landscape or None)
         @:return: a list of matching photos
         """
-        logger.info("requested_orientation = %s", requested_orientation)
+        logger.debug("requested_orientation = %s", requested_orientation)
         eligible_photos = []
         for i, photo in enumerate(self.api.photos.albums[album]):
             logger.debug("%d - Checking %s", i, photo.filename)
@@ -136,7 +142,7 @@ class IcloudPhotos:
         """
         for i, photo in enumerate(photos):
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
-                logger.info("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
+                logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
                             photo._master_record["fields"]["originalOrientation"]["value"])
                 data = photo.download().raw.read()
                 # cannot crop HEIC images with Pillow

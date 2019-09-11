@@ -70,7 +70,7 @@ def get_file_exif_orientation(image_filename):
     """
     with open(image_filename, 'rb') as f:
         exif_tags = exifread.process_file(f, details=False)
-        logger.info("EXIF data: %s", list(exif_tags.keys()))
+        logger.debug("EXIF data: %s", list(exif_tags.keys()))
 
         try:
             # TODO: use correct EXIF tag to determine orientation
@@ -107,10 +107,14 @@ def is_portrait(width, height, exif_orientation=1):
     logger.debug("EXIF orientation = %s; width = %d; height = %d", exif_orientation, width, height)
 
     # swap width/height based on EXIF rotation tags
-    if get_exif_rotation_angle(exif_orientation) in (0, 180):  # landscape
-        exif_width, exif_height = width, height
-    else:  # portrait
-        exif_width, exif_height = height, width
+    angle = get_exif_rotation_angle(exif_orientation)
+    logger.debug("angle=%s", angle)
+
+    exif_width, exif_height = width, height
+
+    # rotate dimensions based on EXIF data
+    if angle not in (0, 180):  # camera was rotated
+        exif_width, exif_height = exif_height, exif_width
 
     # is photo portrait or landscape?
     return exif_width <= exif_height

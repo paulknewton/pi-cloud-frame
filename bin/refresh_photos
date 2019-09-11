@@ -6,7 +6,8 @@
 
 USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos"
 
-TEST=
+#DELETE=echo
+DELETE=
 
 if [ $# -ne 5 ]; then
     echo $USAGE
@@ -33,7 +34,7 @@ case $3 in
         DOWNLOAD=tmp/raw
         CROPPED=tmp/crop
         OUT=media/nixplay2
-        ASPECT="16:10"
+        ASPECT="10:16"
         ORIENTATION="--orientation portrait"
         ;;
     # raspberry pi with official display
@@ -67,7 +68,7 @@ EOF
 
 mkdir -p "$DOWNLOAD"
 echo "Cleaning download folder $DOWNLOAD..."
-$TEST rm -f "$DOWNLOAD"/*
+$DELETE rm -f "$DOWNLOAD"/*
 
 # download photos from icloud
 echo "Downloading photos to $DOWNLOAD..."
@@ -81,7 +82,7 @@ fi
 
 mkdir -p "$CROPPED"
 echo "Cleaning crop folder $CROPPED..."
-$TEST rm -f "$CROPPED"/*
+$DELETE rm -f "$CROPPED"/*
 
 # crop the new photos
 echo "Cropping photos from $DOWNLOAD to $CROPPED..."
@@ -90,12 +91,12 @@ for SRC_FILE in "$ROOT/$DOWNLOAD"/*;
 do
     OUT_FILE=`basename "$SRC_FILE" | sed -e 's/ /_/g'`
     echo Cropping $OUT_FILE
-    $TEST aspectcrop -a "$ASPECT" "$SRC_FILE" "$OUT_FILE"
+    aspectcrop -a "$ASPECT" "$SRC_FILE" "$OUT_FILE"
 done
 cd "$ROOT"
 
 echo "Cleaning download folder $DOWNLOAD..."
-$TEST rm -f "$DOWNLOAD"/*
+$DELETE rm -f "$DOWNLOAD"/*
 
 mkdir -p "$OUT"
 #echo "Cleaning final output  folder $OUT..."
@@ -107,9 +108,9 @@ cd "$OUT"
 for i in "$ROOT/$CROPPED"/*
 do
     echo `basename "$i"`
-    $TEST convert "$i" `basename "$i"`.jpg
+    convert -auto-orient "$i" `basename "$i"`.jpg
 done
 cd "$ROOT"
 
 echo "Cleaning crop folder $CROPPED..."
-$TEST rm -f "$CROPPED"/*
+$DELETE rm -f "$CROPPED"/*
