@@ -69,6 +69,7 @@ class IcloudPhotos:
         media_type = IcloudPhotos._get_media_type(photo)
 
         if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]):
+        #if (media_type not in ["public.heic"]):
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 

@@ -6,8 +6,8 @@
 
 USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos"
 
-#DELETE=echo
-DELETE=
+DELETE=echo
+#DELETE=
 
 if [ $# -ne 5 ]; then
     echo $USAGE
@@ -108,7 +108,7 @@ cd "$OUT"
 for i in "$ROOT/$CROPPED"/*
 do
     echo `basename "$i"`
-    convert -auto-orient "$i" `basename "$i"`.jpg
+    convert "$i" `basename "$i"`.jpg
 done
 cd "$ROOT"
 
