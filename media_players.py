@@ -228,6 +228,5 @@ class PhotoPlayer(AbstractMediaPlayer):
                 QtCore.Qt.SmoothTransformation))
             return True
 
-        else:
-            logger.info("Could not load image: %s", image_filename)
-            return False
+        logger.info("Could not load image: %s", image_filename)
+        return False
