@@ -39,7 +39,6 @@ class AbstractMediaPlayer(ABC):
 
         :return: the top-level widget
         """
-        pass
 
     def refresh_media_list(self):
         """
