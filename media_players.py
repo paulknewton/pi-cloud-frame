@@ -176,7 +176,7 @@ class PhotoPlayer(AbstractMediaPlayer):
     def show_current_media(self):
         if not self._media_list:
             self.main_window.setText("Media Player %s: No media to show" % self.get_name())
-            return
+            return True
 
         angle_to_rotate_photo = 0
 
