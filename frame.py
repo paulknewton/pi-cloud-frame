@@ -370,8 +370,8 @@ def main():
     try:
         window = PhotoFrame(read_config())
         window.raise_()
-    except KeyError as e:
-        print("Error setting up frame: ", e)
+    except KeyError as exception:
+        print("Error setting up frame: ", exception)
         sys.exit(1)
 
     app.exec_()
