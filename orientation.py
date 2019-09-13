@@ -22,9 +22,9 @@ class Compass:
         angle = self.get_rotation()
         if angle == 0:
             return 0
-        else:
-            rounded = int((abs(angle) + 45) / 90) * 90 * int(angle / abs(angle))
-            return rounded % 360
+        
+        rounded = int((abs(angle) + 45) / 90) * 90 * int(angle / abs(angle))
+        return rounded % 360
 
     def is_portrait_frame(self):
         """
