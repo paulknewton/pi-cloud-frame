@@ -47,7 +47,6 @@ class IcloudPhotos:
 
         return api
 
-
     @staticmethod
     def _get_media_type(photo):
         # root, ext = os.path.splitext(photo.filename)
