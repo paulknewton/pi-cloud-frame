@@ -40,8 +40,8 @@ def main():
         # get all photos in the photo frame album
         logger.info("Downloading photo list...")
         photos = api.get_all_photos(args.album, args.orientation)
-    except KeyError as e:
-        print("Could not find album: ", e)
+    except KeyError as exception:
+        print("Could not find album: ", exception)
         sys.exit(1)
 
     # get a random sample to download
