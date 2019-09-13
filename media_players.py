@@ -105,7 +105,7 @@ class AbstractMediaPlayer(ABC):
         def passed_end(i, l):
             return i >= len(l) - 1
 
-        def jump_to_start(i, l):
+        def jump_to_start(_unused_i, _unused_l):
             return 0
 
         def move_to_next(i):
@@ -118,10 +118,10 @@ class AbstractMediaPlayer(ABC):
         Display the previous media. If at the start of the playlist, jump to the end
         """
 
-        def before_start(i, l):
+        def before_start(i, _unused_l):
             return i <= 0
 
-        def jump_to_end(i, l):
+        def jump_to_end(_unused_i, l):
             return len(l) - 1
 
         def move_to_prev(i):
