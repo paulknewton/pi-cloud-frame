@@ -19,7 +19,7 @@ install:
 script:
   - coverage run -m pytest
   #- coverage run -m pytest tests
-#ignore:
-#- tests/**/*
+ignore:
+- tests/**/*
 after_success:
   - codecov
