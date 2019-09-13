@@ -29,7 +29,7 @@ class Popup(QDialog):
         self.labels = ["Filename:", "Date:", "Location:"]  # static labels
         # list of QLabel widgets, each corresponding to a static label
         self.value_widgets = None
-        self._build_UI()
+        self._build_ui()
 
     def show_image_details(self, filename, exif_tags):
         logger.debug("exif tags: %s", exif_tags)
@@ -71,7 +71,7 @@ class Popup(QDialog):
         # self.date_label.adjustSize()
         self.show()
 
-    def _build_UI(self):
+    def _build_ui(self):
         layout = QGridLayout(self)
         self.value_widgets = []
 
@@ -127,7 +127,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             self.compass = None
 
         self.setup_players()
-        self._build_UI()
+        self._build_ui()
         self.popup = None
 
         # start timer
@@ -232,7 +232,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def _timer_callback(self):
         self.get_current_player().next()
 
-    def _build_UI(self):
+    def _build_ui(self):
         # setup UI - use a QStackedWidget to avoid widgets being destroyed
         self.stack = QtWidgets.QStackedWidget(self)
         for p in self.players:
