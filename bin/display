@@ -12,13 +12,14 @@ fi
 
 case $1 in
     on)
+        echo "Switching display $1"
         echo 0 | sudo tee /sys/class/backlight/rpi_backlight/bl_power > /dev/null
         ;;
     off)
+        echo "Switching display $1"
         echo 1 | sudo tee /sys/class/backlight/rpi_backlight/bl_power > /dev/null
         ;;
     *)
-        echo "Unknown argument $1. Exiting."
-        echo $USAGE
-        exit 1
+        echo "Setting brightness to $1"
+        echo $1 | sudo tee /sys/class/backlight/rpi_backlight/brightness
 esac
