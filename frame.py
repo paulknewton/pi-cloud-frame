@@ -253,7 +253,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         logger.debug("Changing to player index %d (%s)", index, new_player.get_name())
         self.stack.setCurrentIndex(index)
         self.current_player_index = index
-        new_player.show_current_media()
+        #new_player.show_current_media()
 
     def mousePressEvent(self, mouse):
         """
@@ -284,9 +284,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # click on the top/bottom borders = prev/next media player
         elif y >= height * 0.8:
-            self.next_player()
+            self.next_player().next()
         elif y <= height * 0.2:
-            self.prev_player()
+            self.prev_player().next()
 
         # click in the centre = raise popup showing photo information
         elif not popup_closed:

@@ -6,8 +6,8 @@
 
 USAGE="refresh_photos icloud_id icloud_pwd profile album num_photos"
 
-DELETE=echo
-#DELETE=
+#DELETE=echo
+DELETE=
 
 if [ $# -ne 5 ]; then
     echo $USAGE
@@ -38,12 +38,19 @@ case $3 in
         ORIENTATION="--orientation portrait"
         ;;
     # raspberry pi with official display
-    pi)
+    pi-landscape)
         DOWNLOAD=tmp/raw
         CROPPED=tmp/crop
         OUT=media/photos
         ASPECT="800:480"
-        #ORIENTATION=portrait
+        ORIENTATION="--orientation landscape"
+        ;;
+    pi-portrait)
+        DOWNLOAD=tmp/raw
+        CROPPED=tmp/crop
+        OUT=media/photos
+        ASPECT="800:480"
+        ORIENTATION="--orientation portrait"
         ;;
     *)
         echo Unknown profile $3. Exiting.
