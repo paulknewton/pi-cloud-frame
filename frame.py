@@ -206,6 +206,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             new_index = self.current_player_index + 1
 
         self._set_player_by_index(new_index)
+        return self.get_current_player()
 
     def prev_player(self):
         """
@@ -220,6 +221,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             new_index = self.current_player_index - 1
 
         self._set_player_by_index(new_index)
+        return self.get_current_player()
 
     def get_current_player(self):
         """
