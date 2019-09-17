@@ -19,7 +19,7 @@ class AbstractMediaPlayer(ABC):
     def __init__(self, name, folder, compass):
         """
         Create a default abstract media player.
-        All sub-classes should call this parent constructor.
+        All sub-classes should call this constructor.
 
         :param name: string used to refer to the media player
         :param folder: folder containing the media (images, video...)

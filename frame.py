@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import logging
 import sys
+import os
 
 import yaml
 from PyQt5 import QtWidgets, QtCore
@@ -20,8 +21,10 @@ CONFIG_FILE = "config.yml"
 
 
 class Popup(QDialog):
-    def __init__(self, font_size):
+    def __init__(self, frame, font_size):
         super().__init__()
+        self.frame = frame  # to access methods on the photo frame
+
         self.font_size = font_size
         self.setWindowModality(Qt.NonModal)
         self.setWindowFlag(Qt.FramelessWindowHint)
@@ -31,11 +34,15 @@ class Popup(QDialog):
         self.value_widgets = None
         self._build_ui()
 
+        # ref to current filename (used to delete files)
+        self._current_filename = None
+
     def show_image_details(self, filename, exif_tags):
+        self._current_filename = filename
         logger.debug("exif tags: %s", exif_tags)
 
-        logger.debug("Filename: %s", filename)
-        self.value_widgets[0].setText(filename)
+        logger.debug("Filename: %s", self._current_filename)
+        self.value_widgets[0].setText(self._current_filename)
 
         # extract EXIF data (if any)
         date = location = "<unknown>"
@@ -94,13 +101,20 @@ class Popup(QDialog):
             layout.addWidget(value_widget, y, 1)
             self.value_widgets.append(value_widget)
 
-        whatsapp_button = QPushButton("Send photo", self)
+        whatsapp_button = QPushButton("Delete photo", self)
         whatsapp_button.clicked.connect(self.on_click)
         layout.addWidget(whatsapp_button)
 
     @pyqtSlot()
     def on_click(self):
-        logger.info("PyQt5 button click. TODO")
+        if not self._current_filename:
+            logger.error("Filename not defined. Cannot remove it.")
+            return
+
+        logger.info("Deleting %s", self._current_filename)
+        os.remove(self._current_filename)
+        self.close()
+        self.frame.get_current_player().next()
 
 
 class PhotoFrame(QtWidgets.QMainWindow):
@@ -110,7 +124,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.players = None
         self.current_player_index = 0
 
-        # instance variables read from config file
+        # instance variables to be read from config file
         self.slideshow_delay = 0
         self.media_folder = None
         self.font_size = 0
@@ -255,7 +269,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         logger.debug("Changing to player index %d (%s)", index, new_player.get_name())
         self.stack.setCurrentIndex(index)
         self.current_player_index = index
-        #new_player.show_current_media()
+        # new_player.show_current_media()
 
     def mousePressEvent(self, mouse):
         """
@@ -294,7 +308,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         elif not popup_closed:
             logger.debug("Open popup")
             if not self.popup:
-                self.popup = Popup(self.font_size)
+                self.popup = Popup(self, self.font_size)
             filename, exif = self.get_current_player().get_current_media_exif()
             self.popup.show_image_details(filename, exif)
 
