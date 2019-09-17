@@ -150,8 +150,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         timer.start(self.slideshow_delay)
 
         # go...
-        self.showFullScreen()
         self.get_current_player().next()
+        self.showFullScreen()
 
     def setup_general_config(self):
         """
