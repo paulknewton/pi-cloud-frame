@@ -83,7 +83,7 @@ class AbstractMediaPlayer(ABC):
     def show_current_media(self):
         """
         Display the current media. Must be overridden by each sub-class.
-        :return: True if the media can he loaded, otherwise False. Media may not be able to be shown for a variety of reasons (missing file, incompatible frame rotation etc)
+        :return: True if the media can the loaded, otherwise False (missing file, incompatible frame rotation etc)
         """
 
     def get_current_media_exif(self):
