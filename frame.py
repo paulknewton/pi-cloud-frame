@@ -153,7 +153,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.showFullScreen()
         self.get_current_player().next()
 
-
     def setup_general_config(self):
         """
         Read config values from config.yml file
