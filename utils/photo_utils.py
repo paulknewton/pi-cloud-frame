@@ -10,11 +10,11 @@ logger = logging.getLogger(__name__)
 
 def get_sample(photos, n):
     """
-    Select a random sample from a list of photos.
+    Select a random sample from a list of network.
 
-    :param photos: list of photos
-    :param n: number of photos to sample
-    :return: a random list of samples containing n items (or fewer if there are not enough photos)
+    :param photos: list of network
+    :param n: number of network to sample
+    :return: a random list of samples containing n items (or fewer if there are not enough network)
     """
     n = min(n, len(photos))
     n = max(n, 0)  # avoid -ve numbers

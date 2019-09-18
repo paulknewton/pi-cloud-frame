@@ -2,7 +2,7 @@ import mock
 import pytest
 from mock import PropertyMock
 
-from icloud_photos import IcloudPhotos
+from network.icloud_photos import IcloudPhotos
 
 
 class DummyPhoto:

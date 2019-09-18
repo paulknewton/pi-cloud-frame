@@ -1,6 +1,6 @@
 import pytest
 
-import photo_utils as pu
+from utils import photo_utils as pu
 
 
 def test_sample():
@@ -86,7 +86,7 @@ def test_invalid_exif_rotation():
 
 
 def test_no_exif_orientation():
-    portrait_file = "tests/portrait_no_exif.jpg"
+    portrait_file = "portrait_no_exif.jpg"
 
     assert pu.get_file_exif_orientation(portrait_file) is None
 

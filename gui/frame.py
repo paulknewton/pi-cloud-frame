@@ -2,17 +2,17 @@
 import logging
 import sys
 import os
+from config import Config
 
-import yaml
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
-import photo_utils
-from media_players import VideoPlayer, PhotoPlayer
-from orientation import Compass
+from utils import photo_utils
+from gui.media_players import VideoPlayer, PhotoPlayer
+from utils.orientation import Compass
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -121,18 +121,18 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def __init__(self, config):
         super(PhotoFrame, self).__init__()
 
-        self.players = None
-        self.current_player_index = 0
-
         # instance variables to be read from config file
         self.slideshow_delay = 0
         self.media_folder = None
         self.font_size = 0
         self.rotation = False
 
-        # read from the config file
+        self.players = None
+        self.current_player_index = 0
+
+        # read values from the config file
         self.config = config
-        self.setup_general_config()
+        self._setup_general_config()
 
         # setup an accelerometer if frame rotation enable
         if self.rotation:
@@ -140,7 +140,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         else:
             self.compass = None
 
-        self.setup_players()
+        self._setup_players()
         self._build_ui()
         self.popup = None
 
@@ -153,30 +153,33 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.showFullScreen()
         self.get_current_player().next()
 
-    def setup_general_config(self):
+    def _setup_general_config(self):
         """
         Read config values from config.yml file
         """
-        frame_config = self._get_config_value(self.config, "frame", None)
+        frame_config = self.config.get_config_value("frame")
         if not frame_config:
             raise KeyError("Could not find section 'frame' in config file. Exiting")
 
-        self.slideshow_delay = int(self._get_config_value(frame_config, "slideshow_delay", 5000))
+        self.slideshow_delay = int(self.config.get_config_value("slideshow_delay", frame_config))
         logger.info("Slideshow delay = %d", self.slideshow_delay)
-        self.media_folder = self._get_config_value(frame_config, "media_folder", "tmp")
+
+        self.media_folder = self.config.get_config_value("media_folder", frame_config)
         logger.info("Media folder = %s", self.media_folder)
-        self.font_size = int(self._get_config_value(frame_config, "font", "12"))
+
+        self.font_size = int(self.config.get_config_value("font", frame_config))
         logger.info("Font size = %d", self.font_size)
-        self.rotation = bool(self._get_config_value(frame_config, "frame_rotation", False))
+
+        self.rotation = bool(self.config.get_config_value("frame_rotation", frame_config))
         logger.info("Rotation = %s", self.rotation)
 
-    def setup_players(self):
+    def _setup_players(self):
         """
         Factory method to create the set of media players
 
         :return: a list of AbstractMediaPlayer instances
         """
-        players_config = self._get_config_value(self.config, "players", None)
+        players_config = self.config.get_config_value("players")
         if not players_config:
             raise KeyError("Could not find section 'players' in config file. Exiting")
 
@@ -192,20 +195,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
             logger.info("Creating player %s", player.get_name())
             self.players.append(player)
         self.current_player_index = 0
-
-    @staticmethod
-    def _get_config_value(config, key, default):
-        if not (config and key):
-            logger.debug("Using default for config value %s = %s", key, default)
-            return default
-
-        try:
-            value = config[key]
-        except KeyError:
-            logger.debug("Using default for config value %s = %s", key, default)
-            return default
-        logger.debug("Config value %s = %s", key, value)
-        return value
 
     def next_player(self):
         """
@@ -357,23 +346,6 @@ def exception_hook(exctype, value, traceback):
     sys.exit(1)
 
 
-def read_config():
-    """
-    Read configuration file and return a dictionary of parameters
-
-    :return: a dictionary of parameters representing the YAML file (see YAML spec)
-    """
-    try:
-        with open(CONFIG_FILE, 'r') as ymlfile:
-            cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-    except FileNotFoundError:
-        logger.error("Could not load config file %s. Exiting.", CONFIG_FILE)
-        sys.exit(1)
-    # data = yaml.dump(cfg, Dumper=yaml.CDumper)
-    # print(data)
-    return cfg
-
-
 def main():
     """
     Create the photo frame application
@@ -383,8 +355,10 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
 
+    config = Config(CONFIG_FILE)
+
     try:
-        window = PhotoFrame(read_config())
+        window = PhotoFrame(config)
         window.raise_()
     except KeyError as exception:
         print("Error setting up frame: ", exception)
