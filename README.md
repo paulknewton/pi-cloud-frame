@@ -5,7 +5,7 @@
 # pi cloud frame
 
 An icloud-powered digital frame running on a Raspberry Pi.
-Downloads a random sample of photos from your icloud account and displays them. Photos are periodically refreshed.
+Downloads a random sample of photos from your icloud account and displays them. Supports multiple, parallel slideshows and interactive menus.
 
 ## What is it?
 
