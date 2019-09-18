@@ -1,4 +1,4 @@
-import orientation
+from utils import orientation
 
 
 def test_portrait_check():

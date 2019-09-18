@@ -3,8 +3,8 @@
 import argparse
 import logging
 import sys
-import photo_utils
-from icloud_photos import IcloudPhotos
+from utils import photo_utils
+from network.icloud_photos import IcloudPhotos
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -18,10 +18,10 @@ def main():
         description="icloud photo frame")
     parser.add_argument("user", help="icloud user")
     parser.add_argument("password", help="password")
-    parser.add_argument("--output", help="folder to store downloaded photos", default="tmp/raw")
-    parser.add_argument("--sample", help="number of photos to download", type=int, default=5)
-    parser.add_argument("--album", help="icloud album to find photos", default="All Photos")
-    parser.add_argument("--orientation", help="orientation of photos", choices=["portrait", "landscape"],
+    parser.add_argument("--output", help="folder to store downloaded network", default="tmp/raw")
+    parser.add_argument("--sample", help="number of network to download", type=int, default=5)
+    parser.add_argument("--album", help="icloud album to find network", default="All Photos")
+    parser.add_argument("--orientation", help="orientation of network", choices=["portrait", "landscape"],
                         default=None)
     parser.add_argument("--list", help="list albums (no photo downloading)", action='store_true', default=False)
     args = parser.parse_args()
@@ -37,7 +37,7 @@ def main():
         sys.exit(1)
 
     try:
-        # get all photos in the photo frame album
+        # get all network in the photo frame album
         logger.info("Downloading photo list...")
         photos = api.get_all_photos(args.album, args.orientation)
     except KeyError as exception:
@@ -48,7 +48,7 @@ def main():
     logger.info("Selecting random sample (%d from %d)", args.sample, len(photos))
     photos_sample = photo_utils.get_sample(photos, args.sample)
 
-    logger.info("Downloading photos to %s...", args.output)
+    logger.info("Downloading network to %s...", args.output)
     IcloudPhotos.download(photos_sample, args.output)
 
 

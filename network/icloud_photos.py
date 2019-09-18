@@ -4,7 +4,7 @@ import sys
 
 from pyicloud import PyiCloudService
 
-import photo_utils
+from utils import photo_utils
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ class IcloudPhotos:
         media_type = IcloudPhotos._get_media_type(photo)
 
         if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]):
-        # if (media_type not in ["public.heic"]):
+            # if (media_type not in ["public.heic"]):
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 
@@ -113,11 +113,11 @@ class IcloudPhotos:
 
     def get_all_photos(self, album, requested_orientation):
         """
-        Retrieve all photos from the specified icloud album. Only photos that are images and match the requested requested_orientation are returned.
+        Retrieve all network from the specified icloud album. Only network that are images and match the requested requested_orientation are returned.
 
         @:param album: the icloud album to search
-        @:param requested_orientation: the requested_orientation of the photos (portrait, landscape or None)
-        @:return: a list of matching photos
+        @:param requested_orientation: the requested_orientation of the network (portrait, landscape or None)
+        @:return: a list of matching network
         """
         logger.debug("requested_orientation = %s", requested_orientation)
         eligible_photos = []
@@ -135,18 +135,29 @@ class IcloudPhotos:
     @staticmethod
     def download(photos, folder):
         """
-        Download the specific photos from the icloud and store them locally
+        Download the specific network from the icloud and store them locally
 
-        :param photos: list of photos to download
-        :param folder: the folder to store the photos locally
+        :param photos: list of network to download
+        :param folder: the folder to store the network locally
         """
         for i, photo in enumerate(photos):
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
+                # logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
+                #             photo._asset_record["fields"]["orientation"]["value"])
                 logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
-                            photo._master_record["fields"]["originalOrientation"]["value"])
-                data = photo.download().raw.read()
-                # cannot crop HEIC images with Pillow
-                # crop_image(PIL.Image.open(os.io.BytesIO(data)), float(16 / 9))
+                             photo._master_record["fields"]["originalOrientation"]["value"])
+
+                # try latest record first (if available)
+                try:
+                    url = photo._asset_record["fields"]["resJPEGFullRes"]["value"]["downloadURL"]
+                    data = photo._service.session.get(
+                        url,
+                        stream=True
+                    ).raw.read()
+
+                # otherwise get original record
+                except KeyError:
+                    data = photo.download().raw.read()
                 opened_file.write(data)
 
     def get_albums(self):

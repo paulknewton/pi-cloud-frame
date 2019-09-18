@@ -1,4 +1,4 @@
-import photo_utils
+from utils import photo_utils
 
 
 def test_gps_location():

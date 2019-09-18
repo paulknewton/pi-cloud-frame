@@ -6,7 +6,7 @@ import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtGui import QImage
 
-import photo_utils
+from utils import photo_utils
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +83,8 @@ class AbstractMediaPlayer(ABC):
     def show_current_media(self):
         """
         Display the current media. Must be overridden by each sub-class.
-        :return: True if the media can he loaded, otherwise False. Media may not be able to be shown for a variety of reasons (missing file, incompatible frame rotation etc)
+        :return: True if the media can the loaded, otherwise False (missing file, incompatible frame rotation etc)
         """
-        pass
 
     def get_current_media_exif(self):
         if not self._media_list:
@@ -183,10 +182,10 @@ class PhotoPlayer(AbstractMediaPlayer):
         image_filename = self._media_list[self._current_media_index]
         logger.debug("Loading image %s", image_filename)
 
-        # we alwways need this (even to discard incompatible photos) so check now
+        # we alwways need this (even to discard incompatible network) so check now
         exif_orientation = photo_utils.get_file_exif_orientation(image_filename)
 
-        # if frame rotation detection is supported, skip portrait photos if frame is in landscape mode (and vice versa)
+        # if frame rotation detection is supported, skip portrait network if frame is in landscape mode (and vice versa)
         if self.compass:
 
             is_portrait_frame_check = self.compass.is_portrait_frame()

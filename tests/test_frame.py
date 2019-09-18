@@ -1,4 +1,4 @@
-import media_players
+from gui import media_players
 
 
 def skip_test_playlist():

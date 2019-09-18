@@ -5,7 +5,7 @@
 # pi cloud frame
 
 An icloud-powered digital frame running on a Raspberry Pi.
-Downloads a random sample of photos from your icloud account and displays them. Photos are periodically refreshed.
+Downloads a random sample of photos from your icloud account and displays them. Supports parallel slideshows, interactive menus, GPS/EXIF lookup and auto rotation via MPU-6050 accelerometers.
 
 ## What is it?
 
@@ -90,19 +90,28 @@ The program needs to be configured in ```config.yml``` to specify the folders to
 frame:
     slideshow_delay: 30000
     media_folder: media
+    font: 14
+    frame_rotation: true
 
 players:
-    Photo Player:
+    Holiday Photo Player:
         type: photo_player
-        folder: photos
+        folder: italy
+        
+    Family Photo Player:
+        type: photo_player
+        folder: personal
+        
     Video Player:
         type: video_player
-        folder: video
+        folder: myvideo
 ```
 * frame
     General config parameters for the display frame:
     * slideshow_delay: the delay (in ms) between photo transitions
     * media_folder: the main root of the media files (each player has a sub-folder under this directory)
+    * font: size of font to use for popup menus
+    * frame_rotation: if frame knows which way it is rotated (using an accelerometer)
 * players
     A list of media players.
     * type: the type of media player. The current implementation only support photo_player (video_player is allowed, but is not yet implemented)
