@@ -157,7 +157,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         """
         Read config values from config.yml file
         """
-        frame_config = self.config.get_config_value("frame")
+        frame_config = self.config.get_config_value("frame", self.config.root)
         if not frame_config:
             raise KeyError("Could not find section 'frame' in config file. Exiting")
 
@@ -179,7 +179,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         :return: a list of AbstractMediaPlayer instances
         """
-        players_config = self.config.get_config_value("players")
+        players_config = self.config.get_config_value("players", self.config.root)
         if not players_config:
             raise KeyError("Could not find section 'players' in config file. Exiting")
 
