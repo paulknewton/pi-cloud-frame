@@ -1,8 +1,7 @@
 #! /usr/bin/env python3
 import logging
-import sys
 import os
-from config import Config
+import sys
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
@@ -10,14 +9,11 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
-from utils import photo_utils
 from gui.media_players import VideoPlayer, PhotoPlayer
+from utils import photo_utils
 from utils.orientation import Compass
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-CONFIG_FILE = "config.yml"
 
 
 class Popup(QDialog):
@@ -330,42 +326,3 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def refresh_current_playlist(self):
         logger.info("Refreshing media list for %s", self.get_current_player().get_name())
         self.get_current_player().refresh_media_list()
-
-
-def exception_hook(exctype, value, traceback):
-    """
-    Handle exceptions in the Qt application. Prevents exceptions being consumed silently by Qt.
-    :param exctype: the type of exception
-    :param value: the exception contents
-    :param traceback: the stack trace
-    """
-    # Print the error and traceback
-    print(exctype, value, traceback)
-    # Call the normal Exception hook after
-    sys._excepthook(exctype, value, traceback)
-    sys.exit(1)
-
-
-def main():
-    """
-    Create the photo frame application
-    """
-    sys._excepthook = sys.excepthook
-    sys.excepthook = exception_hook
-
-    app = QtWidgets.QApplication(sys.argv)
-
-    config = Config(CONFIG_FILE)
-
-    try:
-        window = PhotoFrame(config)
-        window.raise_()
-    except KeyError as exception:
-        print("Error setting up frame: ", exception)
-        sys.exit(1)
-
-    app.exec_()
-
-
-if __name__ == '__main__':
-    main()
