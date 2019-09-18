@@ -19,7 +19,7 @@ class DummyPhoto:
         pass
 
 
-@mock.patch("tests.test_icloud.DummyPhoto._master_record", new_callable=PropertyMock)
+@mock.patch("DummyPhoto._master_record", new_callable=PropertyMock)
 def test_is_image_with_photos(mock_photo_record):
     """
     Test photo is recognised as an image with various MIME types.
@@ -50,7 +50,7 @@ def test_is_image_with_none():
     assert not IcloudPhotos.is_image(None)
 
 
-@mock.patch("tests.test_icloud.DummyPhoto._master_record", new_callable=PropertyMock)
+@mock.patch("DummyPhoto._master_record", new_callable=PropertyMock)
 def test_is_image_with_none_photos(mock_photo_record):
     """
     Test photo is not classified as an image with various (non-image) MIME types.
@@ -86,9 +86,9 @@ def test_format_invalid_orientation():
         assert IcloudPhotos.is_correct_format(photo, "blah")
 
 
-@mock.patch("tests.test_icloud.DummyPhoto.dimensions", new_callable=PropertyMock)
-@mock.patch("tests.test_icloud.DummyPhoto._asset_record", new_callable=PropertyMock)
-@mock.patch("tests.test_icloud.DummyPhoto._master_record", new_callable=PropertyMock)
+@mock.patch("DummyPhoto.dimensions", new_callable=PropertyMock)
+@mock.patch("DummyPhoto._asset_record", new_callable=PropertyMock)
+@mock.patch("DummyPhoto._master_record", new_callable=PropertyMock)
 def test_format(mock_photo_master_record, mock_photo_asset_record, mock_photo_dimensions):
     """
     Test photo is recognised corrctly as portrait vs. landscape (including when rotated).
