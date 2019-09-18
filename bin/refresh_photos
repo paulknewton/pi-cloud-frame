@@ -49,7 +49,7 @@ case $3 in
         DOWNLOAD=tmp/raw
         CROPPED=tmp/crop
         OUT=media/photos
-        ASPECT="800:480"
+        ASPECT="480:800"
         ORIENTATION="--orientation portrait"
         ;;
     *)
