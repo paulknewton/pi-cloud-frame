@@ -18,13 +18,8 @@ pluggy==0.12.0
 py==1.8.0
 pyicloud==0.9.1
 pyparsing==2.4.0
-<<<<<<< HEAD
 #PyQt5==5.13.0
 #PyQt5-sip==4.19.18
-=======
-PyQt5==5.13.0
-PyQt5-sip==4.19.18
->>>>>>> 85722eecf3a16c90ba3fb5bbe47310ab858db794
 #pyspark==2.4.0
 pytest==5.0.1
 pytz==2019.1
