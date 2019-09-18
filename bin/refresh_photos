@@ -82,9 +82,9 @@ echo "Downloading photos to $DOWNLOAD..."
 ./network/downloader.py "$ICLOUD_USER" "$ICLOUD_PWD" --output "$DOWNLOAD" --album "$ALBUM" --sample "$SAMPLE_SIZE" $ORIENTATION
 
 # if no files, exit
-if [ -n '$(ls -A "$DOWNLOAD")' ]; then
+if [ -z "$(ls $DOWNLOAD)" ]; then
     echo No files downloaded. Exiting.
-#    exit 1
+    exit 1
 fi
 
 mkdir -p "$CROPPED"
