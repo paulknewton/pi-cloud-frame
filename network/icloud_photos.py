@@ -68,7 +68,7 @@ class IcloudPhotos:
         media_type = IcloudPhotos._get_media_type(photo)
 
         if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]):
-        # if (media_type not in ["public.heic"]):
+            # if (media_type not in ["public.heic"]):
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
 
@@ -142,11 +142,22 @@ class IcloudPhotos:
         """
         for i, photo in enumerate(photos):
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
+                # logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
+                #             photo._asset_record["fields"]["orientation"]["value"])
                 logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
-                            photo._master_record["fields"]["originalOrientation"]["value"])
-                data = photo.download().raw.read()
-                # cannot crop HEIC images with Pillow
-                # crop_image(PIL.Image.open(os.io.BytesIO(data)), float(16 / 9))
+                             photo._master_record["fields"]["originalOrientation"]["value"])
+
+                # try latest record first (if available)
+                try:
+                    url = photo._asset_record["fields"]["resJPEGFullRes"]["value"]["downloadURL"]
+                    data = photo._service.session.get(
+                        url,
+                        stream=True
+                    ).raw.read()
+
+                # otherwise get original record
+                except KeyError:
+                    data = photo.download().raw.read()
                 opened_file.write(data)
 
     def get_albums(self):
