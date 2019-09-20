@@ -32,7 +32,7 @@ class AbstractMediaPlayer(ABC):
 
         # load logo
         self.logo_large = QImage("logo.png")
-        self.logo_small = self.logo_large.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        self.logo_small = QImage("logo_small.png")#self.logo_large.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
 
         self.refresh_media_list()
 

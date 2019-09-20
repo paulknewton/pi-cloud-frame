@@ -3,6 +3,7 @@
 
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi-cloud-frame/?ref=repository-badge)
 # pi cloud frame
+![logo_medium](logo_medium.png)
 
 An icloud-powered digital frame running on a Raspberry Pi.
 Downloads a random sample of photos from your icloud account and displays them. Supports parallel slideshows, interactive menus, GPS/EXIF lookup and auto rotation via MPU-6050 accelerometers.

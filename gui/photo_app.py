@@ -34,15 +34,20 @@ class Popup(QDialog):
         self._current_filename = None
 
     def show_image_details(self, filename, exif_tags):
-        self._current_filename = filename
-        logger.debug("exif tags: %s", exif_tags)
+        """
+        Display meta information about the selected photo in the popup dialog.
 
+        :param filename: filename of the photo
+        :param exif_tags: dictionary of EXIF tags for the photo
+        """
         logger.debug("Filename: %s", self._current_filename)
+        self._current_filename = filename
         if not filename:
             filename = "<unknown>"
         self.value_widgets[0].setText(filename)
 
-        # extract EXIF data (if any)
+        # extract EXIF data (set default values in case the information cannot be found)
+        logger.debug("exif tags: %s", exif_tags)
         date = location = "<unknown>"
 
         if isinstance(exif_tags, collections.Mapping):
@@ -92,9 +97,9 @@ class Popup(QDialog):
 
         # centred logo
         logo_label = QLabel(self)
-        logo = QImage("logo.png").scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        logo = QImage("logo_small.png")#.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
         logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
-        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)
+        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
 
         # create labels and empty values
         for y, label in enumerate(self.labels):
@@ -111,10 +116,13 @@ class Popup(QDialog):
         delete_button = QPushButton("Delete photo", self)
         delete_button.clicked.connect(self.on_click)
 
-        layout.addWidget(delete_button)
+        layout.addWidget(delete_button, y + 1, 0, 1, -1)  # span 2 columns
 
     @pyqtSlot()
     def on_click(self):
+        """
+        Callback for delete button. Remove the selected photo from the disk and close the popup.
+        """
         if not self._current_filename:
             logger.error("Filename not defined. Cannot remove it.")
             return
@@ -307,7 +315,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             if not self.popup:
                 self.popup = Popup(self, self.font_size)
 
-            filename, exif = self.get_current_player().get_current_media_exif()
+            filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
             self.popup.show_image_details(filename, exif)
 
     def keyPressEvent(self, key):
