@@ -169,7 +169,7 @@ class PhotoPlayer(AbstractMediaPlayer):
         self.main_window.setAlignment(QtCore.Qt.AlignCenter)
 
         # load logo
-        self.logo = QImage("logo.png").scaledToWidth(200, QtCore.Qt.SmoothTransformation)
+        self.logo = QImage("logo.png").scaledToWidth(100, QtCore.Qt.SmoothTransformation)
 
     def get_main_widget(self):
         return self.main_window
@@ -231,7 +231,7 @@ class PhotoPlayer(AbstractMediaPlayer):
             # overlay the logo
             painter = QPainter()
             painter.begin(pmap)
-            painter.drawImage(pmap.width() - self.logo.width(), pmap.height() - self.logo.height(), self.logo)
+            painter.drawImage(pmap.width() - self.logo.width() - 35, pmap.height() - self.logo.height(), self.logo)
             painter.end()
 
             self.main_window.setPixmap(pmap)
