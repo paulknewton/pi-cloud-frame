@@ -12,14 +12,13 @@ python:
   - "3.7"
   - "3.7-dev"  # 3.7 development branch
 #  - "3.8-dev"  # 3.8 development branch
-  - "nightly"  # nightly build
+#  - "nightly"  # nightly build
 install:
   - pip install codecov pytest-cov
   - pip install -r requirements.txt
 script:
-  #- coverage run -m pytest
   - pytest --cov-report=xml --cov=.
 ignore:
-- tests/**/*
+  - tests/**/*
 after_success:
   - codecov
