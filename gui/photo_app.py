@@ -146,7 +146,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # go...
         self.showFullScreen()
-        self.get_current_player().next()
+        self.get_current_player().splash_screen()
 
     def _setup_general_config(self):
         """

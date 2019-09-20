@@ -30,6 +30,10 @@ class AbstractMediaPlayer(ABC):
         self._media_list = None
         self._current_media_index = None
 
+        # load logo
+        self.logo_large = QImage("logo.png")
+        self.logo_small = self.logo_large.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+
         self.refresh_media_list()
 
     @abstractmethod
@@ -148,6 +152,12 @@ class AbstractMediaPlayer(ABC):
             invalid_media = not self.show_current_media()
             ctr += 1
 
+    def splash_screen(self):
+        self.main_window.setPixmap(QtGui.QPixmap.fromImage(self.logo_large).scaled(
+            self.get_main_widget().size(),
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation))
+
 
 class VideoPlayer(AbstractMediaPlayer):
     def __init__(self, *args, **kwargs):
@@ -167,9 +177,6 @@ class PhotoPlayer(AbstractMediaPlayer):
         super().__init__(*args, **kwargs)
         self.main_window = QtWidgets.QLabel()
         self.main_window.setAlignment(QtCore.Qt.AlignCenter)
-
-        # load logo
-        self.logo = QImage("logo.png").scaledToWidth(100, QtCore.Qt.SmoothTransformation)
 
     def get_main_widget(self):
         return self.main_window
@@ -231,7 +238,7 @@ class PhotoPlayer(AbstractMediaPlayer):
             # overlay the logo
             painter = QPainter()
             painter.begin(pmap)
-            painter.drawImage(pmap.width() - self.logo.width() - 35, pmap.height() - self.logo.height(), self.logo)
+            painter.drawImage(pmap.width() - self.logo_small.width() - 35, pmap.height() - self.logo_small.height(), self.logo_small)
             painter.end()
 
             self.main_window.setPixmap(pmap)
