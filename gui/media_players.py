@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtGui import QImage
+from PyQt5.QtGui import QImage, QPainter
 
 from utils import photo_utils
 
@@ -168,6 +168,9 @@ class PhotoPlayer(AbstractMediaPlayer):
         self.main_window = QtWidgets.QLabel()
         self.main_window.setAlignment(QtCore.Qt.AlignCenter)
 
+        # load logo
+        self.logo = QImage("logo.png").scaledToWidth(200, QtCore.Qt.SmoothTransformation)
+
     def get_main_widget(self):
         return self.main_window
 
@@ -220,11 +223,18 @@ class PhotoPlayer(AbstractMediaPlayer):
         image = QtGui.QImage(image_filename)
         if image:
             image = image.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
-            pmap = QtGui.QPixmap.fromImage(image)
-            self.main_window.setPixmap(pmap.scaled(
+            pmap = QtGui.QPixmap.fromImage(image).scaled(
                 self.get_main_widget().size(),
                 QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation))
+                QtCore.Qt.SmoothTransformation)
+
+            # overlay the logo
+            painter = QPainter()
+            painter.begin(pmap)
+            painter.drawImage(pmap.width() - self.logo.width(), pmap.height() - self.logo.height(), self.logo)
+            painter.end()
+
+            self.main_window.setPixmap(pmap)
             return True
 
         logger.info("Could not load image: %s", image_filename)
