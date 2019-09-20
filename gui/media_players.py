@@ -91,9 +91,10 @@ class AbstractMediaPlayer(ABC):
         """
 
     def get_current_media_exif(self):
-        if not self._media_list:
+        # make sure we have a list of media and a current pointer
+        if not all([self._media_list, self._current_media_index]):
             # self.main_window.setText("Media Player %s: No media to show" % self.get_name())
-            return None
+            return None, None
 
         image_filename = self._media_list[self._current_media_index]
         with open(image_filename, 'rb') as f:

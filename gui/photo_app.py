@@ -1,11 +1,12 @@
+import collections
 import logging
 import os
 import sys
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QImage
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 from gui.media_players import VideoPlayer, PhotoPlayer
@@ -37,36 +38,41 @@ class Popup(QDialog):
         logger.debug("exif tags: %s", exif_tags)
 
         logger.debug("Filename: %s", self._current_filename)
-        self.value_widgets[0].setText(self._current_filename)
+        if not filename:
+            filename = "<unknown>"
+        self.value_widgets[0].setText(filename)
 
         # extract EXIF data (if any)
         date = location = "<unknown>"
-        long_ref = long = lat_ref = lat = ""
-        if "EXIF DateTimeOriginal" in exif_tags.keys():
-            date = str(exif_tags["EXIF DateTimeOriginal"])
 
-        if "GPS GPSLatitudeRef" in exif_tags.keys():
-            lat_ref = exif_tags["GPS GPSLatitudeRef"]
+        if isinstance(exif_tags, collections.Mapping):
+            long_ref = long = lat_ref = lat = ""
+            if "EXIF DateTimeOriginal" in exif_tags.keys():
+                date = str(exif_tags["EXIF DateTimeOriginal"])
 
-        if "GPS GPSLatitude" in exif_tags.keys():
-            lat = exif_tags["GPS GPSLatitude"]
+            if "GPS GPSLatitudeRef" in exif_tags.keys():
+                lat_ref = exif_tags["GPS GPSLatitudeRef"]
 
-        if "GPS GPSLongitudeRef" in exif_tags.keys():
-            long_ref = exif_tags["GPS GPSLongitudeRef"]
+            if "GPS GPSLatitude" in exif_tags.keys():
+                lat = exif_tags["GPS GPSLatitude"]
 
-        if "GPS GPSLongitude" in exif_tags.keys():
-            long = exif_tags["GPS GPSLongitude"]
+            if "GPS GPSLongitudeRef" in exif_tags.keys():
+                long_ref = exif_tags["GPS GPSLongitudeRef"]
 
-        # if we have GPS data, reverse lookup address
-        if all([lat, lat_ref, long, long_ref]):
-            lat_d, lat_m, lat_s = tuple(lat.values)
-            long_d, long_m, long_s = tuple(long.values)
-            location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den, lat_s.num / lat_s.den,
-                                                    lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
-                                                    long_s.num / long_s.den, long_ref)
+            if "GPS GPSLongitude" in exif_tags.keys():
+                long = exif_tags["GPS GPSLongitude"]
 
-            # reformat lines
-            location = "\n".join(location.split(", "))
+            # if we have GPS data, reverse lookup address
+            if all([lat, lat_ref, long, long_ref]):
+                lat_d, lat_m, lat_s = tuple(lat.values)
+                long_d, long_m, long_s = tuple(long.values)
+                location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
+                                                        lat_s.num / lat_s.den,
+                                                        lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
+                                                        long_s.num / long_s.den, long_ref)
+
+                # reformat lines
+                location = "\n".join(location.split(", "))
 
         self.value_widgets[1].setText(date)
         self.value_widgets[2].setText(location)
@@ -84,21 +90,28 @@ class Popup(QDialog):
         font_bold.setPointSize(self.font_size)
         font_bold.setBold(True)
 
+        # centred logo
+        logo_label = QLabel(self)
+        logo = QImage("logo.png").scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
+        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)
+
         # create labels and empty values
         for y, label in enumerate(self.labels):
             label_widget = QLabel(label, self)
             label_widget.setAlignment(QtCore.Qt.AlignRight)
             label_widget.setFont(font_bold)
-            layout.addWidget(label_widget, y, 0)
+            layout.addWidget(label_widget, y + 1, 0)
 
             value_widget = QLabel(self)
             value_widget.setFont(font_roman)
-            layout.addWidget(value_widget, y, 1)
+            layout.addWidget(value_widget, y + 1, 1)
             self.value_widgets.append(value_widget)
 
-        whatsapp_button = QPushButton("Delete photo", self)
-        whatsapp_button.clicked.connect(self.on_click)
-        layout.addWidget(whatsapp_button)
+        delete_button = QPushButton("Delete photo", self)
+        delete_button.clicked.connect(self.on_click)
+
+        layout.addWidget(delete_button)
 
     @pyqtSlot()
     def on_click(self):
@@ -293,6 +306,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             logger.debug("Open popup")
             if not self.popup:
                 self.popup = Popup(self, self.font_size)
+
             filename, exif = self.get_current_player().get_current_media_exif()
             self.popup.show_image_details(filename, exif)
 
