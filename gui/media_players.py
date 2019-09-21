@@ -32,7 +32,7 @@ class AbstractMediaPlayer(ABC):
 
         # load logo
         self.logo_large = QImage("logo.png")
-        self.logo_small = QImage("logo_small.png")#self.logo_large.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        self.logo_small = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
 
         self.refresh_media_list()
 
@@ -239,7 +239,7 @@ class PhotoPlayer(AbstractMediaPlayer):
             # overlay the logo
             painter = QPainter()
             painter.begin(pmap)
-            painter.drawImage(pmap.width() - self.logo_small.width() - 35, pmap.height() - self.logo_small.height(), self.logo_small)
+            painter.drawImage(pmap.width() - self.logo_small.width() - 40, pmap.height() - self.logo_small.height() - 10, self.logo_small)
             painter.end()
 
             self.main_window.setPixmap(pmap)
