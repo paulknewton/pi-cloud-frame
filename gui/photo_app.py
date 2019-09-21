@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 from gui.media_players import VideoPlayer, PhotoPlayer
 from utils import photo_utils
-from utils.orientation import Compass
+from utils.mpu6050 import Mpu6050
 
 logger = logging.getLogger(__name__)
 
@@ -152,7 +152,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # setup an accelerometer if frame rotation enable
         if self.rotation:
-            self.compass = Compass()
+            self.compass = Mpu6050()
         else:
             self.compass = None
 

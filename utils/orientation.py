@@ -1,17 +1,22 @@
-class Compass:
+from abc import ABC, abstractmethod
+
+
+class Compass(ABC):
     """
     Sensor to detect rotation of a frame
     """
-    def __init__(self):
-        self._compass_angle = 90     # default - no rotation (landscape)
 
+    def __init__(self):
+        self._compass_angle = 90  # default - no rotation (landscape)
+
+    @abstractmethod
     def get_rotation(self):
         """
         Get the angle the frame is currently rotated.
         The angle is not rounded.
         :return: the angle
         """
-        return self._compass_angle
+        pass
 
     def get_rotation_simple(self):
         """
