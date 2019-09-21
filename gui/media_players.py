@@ -155,7 +155,7 @@ class AbstractMediaPlayer(ABC):
 
     def splash_screen(self):
         self.main_window.setPixmap(QtGui.QPixmap.fromImage(self.logo_large).scaled(
-            self.get_main_widget().size(),
+            self.get_main_widget().size() / 2,
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation))
 
