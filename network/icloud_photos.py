@@ -144,7 +144,7 @@ class IcloudPhotos:
             with open(os.path.join(folder, photo.filename), 'wb') as opened_file:
                 # logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
                 #             photo._asset_record["fields"]["orientation"]["value"])
-                logger.debug("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
+                logger.info("%d - [%s %s %s]", i, photo.filename, photo.dimensions,
                              photo._master_record["fields"]["originalOrientation"]["value"])
 
                 # try latest record first (if available)
