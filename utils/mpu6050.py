@@ -72,4 +72,4 @@ class Mpu6050Compass(orientation.Compass):
     def get_x_rotation(x, y, z):
         radians = math.atan2(y, Mpu6050Compass.dist(x, z))
 
-        return math.degrees(radians) + 180  # sensor is flipped
+        return 360 - math.degrees(radians)  # sensor is flipped
