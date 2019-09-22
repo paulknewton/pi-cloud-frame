@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Pi Cloud Frame
+Comment=Launch the Pi Cloud Frame application
+Icon=/usr/share/pixmaps/openbox.xpm
+Exec=lxterminal --working-directory=/home/pi/pi-cloud-frame --command /home/pi/pi-cloud-frame/frame.py
+Type=Application
+Encoding=UTF-8
+Terminal=True
+Categories=None;
