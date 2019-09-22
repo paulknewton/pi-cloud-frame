@@ -1,4 +1,4 @@
-from utils import orientation
+from utils import mpu6050, orientation
 
 
 def test_portrait_check():
