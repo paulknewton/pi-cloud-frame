@@ -32,9 +32,9 @@ class Mpu6050Compass(orientation.Compass):
         accel_yout_scaled = accel_yout / 16384.0
         accel_zout_scaled = accel_zout / 16384.0
 
-        logger.debug("accel_xout: ", accel_xout, " scaled: ", accel_xout_scaled)
-        logger.debug("accel_yout: ", accel_yout, " scaled: ", accel_yout_scaled)
-        logger.debug("accel_zout: ", accel_zout, " scaled: ", accel_zout_scaled)
+        logger.debug("accel_xout: %f scaled: %f", accel_xout, accel_xout_scaled)
+        logger.debug("accel_yout: %f scaled: %f", accel_yout, accel_yout_scaled)
+        logger.debug("accel_zout: %f scaled: %f", accel_zout, accel_zout_scaled)
 
         return Mpu6050Compass.get_x_rotation(accel_xout_scaled, accel_yout_scaled, accel_zout_scaled)
 
