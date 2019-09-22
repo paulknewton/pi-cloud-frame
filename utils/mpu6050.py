@@ -21,8 +21,6 @@ class Mpu6050Compass(orientation.Compass):
     address = 0x68  # This is the address value read via the i2cdetect command
 
     def get_rotation(self):
-        return 88
-
         # Now wake the 6050 up as it starts in sleep mode
         Mpu6050Compass.bus.write_byte_data(Mpu6050Compass.address, Mpu6050Compass.power_mgmt_1, 0)
 
