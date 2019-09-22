@@ -24,6 +24,7 @@ class Compass:
         :return: the angle
         """
         angle = self.get_rotation()
+        logger.debug("Frame rotation = %f", angle)
         if angle == 0:
             return 0
 
