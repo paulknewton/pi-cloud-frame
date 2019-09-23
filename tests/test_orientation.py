@@ -134,3 +134,10 @@ def test_compass_rounded():
 
     compass = orientation.Compass(-136)
     assert compass.get_rotation_simple() == 180
+
+def test_flip():
+    compass = orientation.Compass(-90)
+    assert compass.get_rotation_simple() == 270
+
+    compass = orientation.Compass(-90, True)
+    assert compass.get_rotation_simple() == 90
