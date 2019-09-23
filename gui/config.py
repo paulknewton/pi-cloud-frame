@@ -12,7 +12,7 @@ class Config:
         "media_folder": "tmp",      # location of photos under the 'media' folder
         "font": "12",               # font size for popup menu
         "compass": None,            # if automation detection of frame rotation is support (mpu6050 | fixed)
-        "rotation": 90,              # if 'fixed' compass is used, what is the angle of the frame
+        "rotation": 0,              # if 'fixed' compass is used, what is the angle of the frame
         "flip_rotation": False,     # rotation values are inverted to handle upside down accelerometer
         "players": None             # section containing configuration of media players
     }

@@ -21,6 +21,7 @@ pyparsing>=2.4.0
 PyQt5>=5.13.0
 PyQt5-sip>=4.19.18
 pytest>=5.0.1
+pytest>=3.2.2
 pytz>=2019.1
 PyYAML>=5.1.2
 requests>=2.22.0
