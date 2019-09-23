@@ -21,4 +21,7 @@ script:
 ignore:
   - tests/**/*
 after_success:
+  - curl https://deepsource.io/cli | sh
+  - export DEEPSOURCE_DSN=https://e51c9583284740778e50e120fedd6bd9@deepsource.io
+  - ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml
   - codecov
