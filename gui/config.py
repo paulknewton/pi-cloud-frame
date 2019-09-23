@@ -11,7 +11,8 @@ class Config:
         "slideshow_delay": 5000,
         "media_folder": "tmp",
         "font": "12",
-        "frame_rotation": None,
+        "compass": None,
+        "flip_rotation": False,
         "players": None
     }
 

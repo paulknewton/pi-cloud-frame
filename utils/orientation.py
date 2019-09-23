@@ -9,25 +9,29 @@ class Compass:
     Sensor to detect rotation of a frame
     """
 
-    def __init__(self):
-        self._compass_angle = 90  # default - no rotation (landscape)
+    def __init__(self, flip):
+        self.flip = flip
+        self._compass_angle = 270  # default - no rotation (landscape)
 
     def get_rotation(self):
         """
         Get the angle the frame is currently rotated.
-        The angle is not rounded.
+        The angle is not rounded or corrected for flipped sensor position.
         :return: the angle
         """
         return self._compass_angle
 
     def get_rotation_simple(self):
         """
-        Return the angle of rotation, rounded to each quadrant of 90 degrees (0, 90, 180, 270).
+        Return the angle of rotation, rounded to each quadrant of 90 degrees (0, 90, 180, 270), and corrected for flipped sensor position.
         Actual angle may be -ve, but returned value is always 0 <= value < 360 (modulo 360)
         :return: the angle
         """
         angle = self.get_rotation()
         logger.debug("Frame rotation = %f", angle)
+        if self.flip:
+            angle = -angle
+            logger.debug("Sensor is flipped. Corrected frame rotation = %f", angle)
         if angle == 0:
             return 0
 

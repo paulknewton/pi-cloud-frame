@@ -140,7 +140,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.slideshow_delay = 0
         self.media_folder = None
         self.font_size = 0
-        self.rotation = False
+        self.compass = False
 
         self.players = None
         self.current_player_index = 0
@@ -150,12 +150,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self._setup_general_config()
 
         # setup an accelerometer if frame rotation enable
-        if self.rotation == "mpu6050":
+        if self.compass == "mpu6050":
             from utils.mpu6050 import Mpu6050Compass
-            self.compass = Mpu6050Compass()
-        elif self.rotation == "fake":
+            self.compass = Mpu6050Compass(self.flip_rotation)
+        elif self.compass == "fake":
             from utils.orientation import Compass
-            self.compass = Compass()
+            self.compass = Compass(self.flip_rotation)
         else:
             self.compass = None
 
@@ -189,8 +189,11 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.font_size = int(self.config.get_config_value("font", frame_config))
         logger.info("Font size = %d", self.font_size)
 
-        self.rotation = self.config.get_config_value("frame_rotation", frame_config)
-        logger.info("Rotation = %s", self.rotation)
+        self.compass = self.config.get_config_value("compass", frame_config)
+        logger.info("Rotation = %s", self.compass)
+
+        self.flip_rotation = self.config.get_config_value("flip_rotation", frame_config)
+        logger.info("Flip Rotation = %s", self.flip_rotation)
 
     def _setup_players(self):
         """
