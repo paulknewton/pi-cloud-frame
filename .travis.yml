@@ -1,3 +1,11 @@
+#### needed for pytest-qt
+addons:
+  apt:
+    packages:
+    - x11-utils
+    - libxkbcommon-x11-0
+services: xvfb
+####
 dist: xenial   # required for Python >= 3.7
 language: python
 python:
