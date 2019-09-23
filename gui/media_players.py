@@ -220,7 +220,7 @@ class PhotoPlayer(AbstractMediaPlayer):
 
             # check compatibility of frame with photo rotation (must be the same)
             if is_portrait_frame_check != is_portrait_image_check:
-                logging.info("Frame rotation does not match photo rotation. Skipping %s.", image_filename)
+                logging.debug("Frame rotation does not match photo rotation. Skipping %s.", image_filename)
                 self.main_window.setText("Frame rotation does not match photo rotation. Skipping %s." % image_filename)
                 return False
 

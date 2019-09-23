@@ -137,10 +137,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         super(PhotoFrame, self).__init__()
 
         # instance variables to be read from config file
-        self.slideshow_delay = 0
+        self.slideshow_delay = None
         self.media_folder = None
-        self.font_size = 0
-        self.compass = False
+        self.font_size = None
+        self.compass = None
+        self.flip_rotation = None
+        self.rotation = None
 
         self.players = None
         self.current_player_index = 0
@@ -153,9 +155,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
         if self.compass == "mpu6050":
             from utils.mpu6050 import Mpu6050Compass
             self.compass = Mpu6050Compass(self.flip_rotation)
-        elif self.compass == "fake":
+        elif self.compass == "fixed":
             from utils.orientation import Compass
-            self.compass = Compass(self.flip_rotation)
+            self.compass = Compass(self.rotation, self.flip_rotation)
         else:
             self.compass = None
 
@@ -190,7 +192,10 @@ class PhotoFrame(QtWidgets.QMainWindow):
         logger.info("Font size = %d", self.font_size)
 
         self.compass = self.config.get_config_value("compass", frame_config)
-        logger.info("Rotation = %s", self.compass)
+        logger.info("Compass = %s", self.compass)
+
+        self.rotation = self.config.get_config_value("rotation", frame_config)
+        logger.info("Rotation = %d", self.rotation)
 
         self.flip_rotation = self.config.get_config_value("flip_rotation", frame_config)
         logger.info("Flip Rotation = %s", self.flip_rotation)

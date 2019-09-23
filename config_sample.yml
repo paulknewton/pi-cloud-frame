@@ -2,7 +2,8 @@ frame:
     slideshow_delay: 30000
     media_folder: media
     font: 14
-    frame_rotation: true
+    compass: mpu6050
+    flip_rotation: true
 
 players:
     Photo Player:
