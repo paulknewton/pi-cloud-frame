@@ -154,7 +154,15 @@ class AbstractMediaPlayer(ABC):
             ctr += 1
 
     def splash_screen(self):
-        self.main_window.setPixmap(QtGui.QPixmap.fromImage(self.logo_large).scaled(
+        angle_to_rotate_photo = 0
+
+        # detect if frame is rotated
+        if self.compass:
+            logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
+            angle_to_rotate_photo = -self.compass.get_rotation_simple()
+
+        self.main_window.setPixmap(QtGui.QPixmap.fromImage(
+            self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
             self.get_main_widget().size() / 2,
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation))
@@ -239,7 +247,8 @@ class PhotoPlayer(AbstractMediaPlayer):
             # overlay the logo
             painter = QPainter()
             painter.begin(pmap)
-            painter.drawImage(pmap.width() - self.logo_small.width() - 40, pmap.height() - self.logo_small.height() - 10, self.logo_small)
+            painter.drawImage(pmap.width() - self.logo_small.width() - 40,
+                              pmap.height() - self.logo_small.height() - 10, self.logo_small)
             painter.end()
 
             self.main_window.setPixmap(pmap)

@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
 from gui.media_players import VideoPlayer, PhotoPlayer
 from utils import photo_utils
-from utils.mpu6050 import Mpu6050Compass
 
 logger = logging.getLogger(__name__)
 
@@ -151,8 +150,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self._setup_general_config()
 
         # setup an accelerometer if frame rotation enable
-        if self.rotation:
+        if self.rotation == "mpu6050":
+            from utils.mpu6050 import Mpu6050Compass
             self.compass = Mpu6050Compass()
+        elif self.rotation == "fake":
+            from utils.orientation import Compass
+            self.compass = Compass()
         else:
             self.compass = None
 
@@ -186,7 +189,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.font_size = int(self.config.get_config_value("font", frame_config))
         logger.info("Font size = %d", self.font_size)
 
-        self.rotation = bool(self.config.get_config_value("frame_rotation", frame_config))
+        self.rotation = self.config.get_config_value("frame_rotation", frame_config)
         logger.info("Rotation = %s", self.rotation)
 
     def _setup_players(self):
