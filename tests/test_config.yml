@@ -3,7 +3,6 @@ frame:
   media_folder: tests/test_media
   compass: fixed
   rotation: 0
-  flip_rotation: false
 
 players:
   Photo Player 1:
@@ -16,4 +15,4 @@ players:
 
   Photo Player 3:
     type: photo_player
-    folder: photos
+    folder: no_photos
