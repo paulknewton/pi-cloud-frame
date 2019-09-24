@@ -23,9 +23,9 @@ class Config:
         try:
             with open(filename, 'r') as ymlfile:
                 self.root = yaml.load(ymlfile, Loader=yaml.FullLoader)
-        except FileNotFoundError:
-            logger.error("Could not load config file %s. Exiting.", filename)
-            sys.exit(1)
+        except FileNotFoundError as e:
+            logger.error("Could not load config file %s", filename)
+            raise e
         # data = yaml.dump(config, Dumper=yaml.CDumper)
         # print(data)
 
