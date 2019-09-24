@@ -12,3 +12,7 @@ players:
   Photo Player 2:
     type: photo_player
     folder: photos
+
+  Photo Player 3:
+    type: photo_player
+    folder: photos
