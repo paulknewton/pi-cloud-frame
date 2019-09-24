@@ -43,7 +43,7 @@ def test_player_slideshow(qtbot, window):
 
     player = window.get_current_player()
 
-    for photo in ["tests/test_media/photos/1.png", "tests/test_media/photos/2.png"]:
+    for photo in player.get_playlist():
         current_pmap = player.get_main_widget().pixmap()
         expected_pmap = QtGui.QPixmap.fromImage(QtGui.QImage(photo)).scaled(
             player.get_main_widget().size(),
