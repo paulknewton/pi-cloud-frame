@@ -8,8 +8,7 @@ from gui.photo_app import PhotoFrame
 
 @pytest.fixture
 def window():
-    window = PhotoFrame(Config("tests/test_config.yml"))
-    return window
+    return PhotoFrame(Config("tests/test_config.yml"))
 
 
 def test_change_players(qtbot, window):
@@ -82,19 +81,15 @@ def test_player_playlist(qtbot, window):
 
     # replace \\ on windows with /
     current_playlist = [file.replace("\\", "/") for file in window.get_current_player().get_playlist()]
-    assert expected_photos == current_playlist
+    assert sorted(expected_photos) == sorted(current_playlist)
 
 
-def test_player_empty_playlist(qtbot, window):
+def test_player_empty_playlist(qtbot):
     """
     Test media player with no photos
     :param qtbot:
     :param window:
     :return:
     """
-    # cycle to a media player with no photos
-    qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    player = window.get_current_player().get_name()
-
+    return PhotoFrame(Config("tests/test_empty.yml"))
     assert window.get_current_player().get_playlist() == []

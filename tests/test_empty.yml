@@ -1,0 +1,10 @@
+frame:
+  slideshow_delay: 3000   # 3 secs
+  media_folder: tests/test_media
+  compass: fixed
+  rotation: 0
+
+players:
+  Photo Player 1:
+    type: photo_player
+    folder: no_photos
