@@ -78,9 +78,11 @@ def test_player_playlist(qtbot, window):
     :param window: PhotoFrame widget
     """
     media_folder = window.get_current_player().get_folder()
-    expected_photos = [media_folder + "\\" + s for s in ["1.png", "2.png"]]
+    expected_photos = [media_folder + "/" + s for s in ["1.png", "2.png"]]
 
-    assert expected_photos == window.get_current_player().get_playlist()
+    # replace \\ on windows with /
+    current_playlist = [file.replace("\\", "/") for file in window.get_current_player().get_playlist()]
+    assert expected_photos == current_playlist
 
 
 def test_player_empty_playlist(qtbot, window):
