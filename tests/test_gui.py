@@ -27,18 +27,19 @@ def test_change_players(qtbot):
 
 def test_cycle_players(qtbot):
     window = PhotoFrame(Config("tests/test_config.yml"))
-    assert type(window.get_current_player()) == gui.media_players.PhotoPlayer
-    assert window.get_current_player().get_name() == "Photo Player 1"
 
-    # down x3
-    qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    assert window.get_current_player().get_name() == "Photo Player 1"
+    player1 = window.get_current_player().get_name()
 
-    # up
+    # down x3 - return back to the same player
+    qtbot.keyPress(window, QtCore.Qt.Key_Down)
+    qtbot.keyPress(window, QtCore.Qt.Key_Down)
+    player3 = window.get_current_player().get_name()
+    qtbot.keyPress(window, QtCore.Qt.Key_Down)
+    assert window.get_current_player().get_name() == player1
+
+    # up - cycle back to the end
     qtbot.keyPress(window, QtCore.Qt.Key_Up)
-    assert window.get_current_player().get_name() == "Photo Player 3"
+    assert window.get_current_player().get_name() == player3
 
 # def test_show_photos(qtbot):
 #    qtbot.wait(5000)
