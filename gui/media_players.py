@@ -132,6 +132,31 @@ class AbstractMediaPlayer(ABC):
 
         return self._next_or_prev(before_start, jump_to_end, move_to_prev)
 
+    def splash_screen(self):
+        angle_to_rotate_photo = 0
+
+        # detect if frame is rotated
+        if self.compass:
+            logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
+            angle_to_rotate_photo = -self.compass.get_rotation_simple()
+
+        self.main_window.setPixmap(QtGui.QPixmap.fromImage(
+            self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
+            self.get_main_widget().size() / 2,
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation))
+
+    def paint_logo(self, pmap):
+        """
+        Overlay the logo on a pixmap
+        :param pmap: the photo
+        """
+        painter = QPainter()
+        painter.begin(pmap)
+        painter.drawImage(pmap.width() - self.logo_small.width() - 40,
+                          pmap.height() - self.logo_small.height() - 10, self.logo_small)
+        painter.end()
+
     def _next_or_prev(self, is_boundary, jump, move):
         self.refresh_media_list()
 
@@ -152,20 +177,6 @@ class AbstractMediaPlayer(ABC):
 
             invalid_media = not self.show_current_media()
             ctr += 1
-
-    def splash_screen(self):
-        angle_to_rotate_photo = 0
-
-        # detect if frame is rotated
-        if self.compass:
-            logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
-            angle_to_rotate_photo = -self.compass.get_rotation_simple()
-
-        self.main_window.setPixmap(QtGui.QPixmap.fromImage(
-            self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
-            self.get_main_widget().size() / 2,
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation))
 
 
 class VideoPlayer(AbstractMediaPlayer):
@@ -244,12 +255,7 @@ class PhotoPlayer(AbstractMediaPlayer):
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation)
 
-            # overlay the logo
-            painter = QPainter()
-            painter.begin(pmap)
-            painter.drawImage(pmap.width() - self.logo_small.width() - 40,
-                              pmap.height() - self.logo_small.height() - 10, self.logo_small)
-            painter.end()
+            self.paint_logo(pmap)
 
             self.main_window.setPixmap(pmap)
             return True

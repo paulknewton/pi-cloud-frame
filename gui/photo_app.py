@@ -295,10 +295,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         """
 
         # close the popup (if open)
-        popup_closed = False
         if self.popup and self.popup.isVisible():
             self.popup.hide()
-            popup_closed = True
 
         # get the width/height of the screen, and the mouse click lco-ords
         width, height = self.size().width(), self.size().height()
@@ -322,12 +320,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # click in the centre = raise popup showing photo information
         elif not popup_closed:
-            logger.debug("Open popup")
-            if not self.popup:
-                self.popup = Popup(self, self.font_size)
-
-            filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
-            self.popup.show_image_details(filename, exif)
+            self._popup()
 
     def keyPressEvent(self, key):
         """
@@ -349,8 +342,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         if key_press == QtCore.Qt.Key_Up:  # up = next media player
             self.prev_player()
 
-        if key_press == 32:  # space = reload image list
-            self.refresh_current_playlist()
+        if key_press in [Qt.Key_Enter, Qt.Key_Return]:  # space = reload image list
+            self._popup()
 
         if key_press == QtCore.Qt.Key_Down:  # down = next player
             self.next_player()
@@ -358,3 +351,11 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def refresh_current_playlist(self):
         logger.info("Refreshing media list for %s", self.get_current_player().get_name())
         self.get_current_player().refresh_media_list()
+
+    def _popup(self):
+        logger.debug("Open popup")
+        if not self.popup:
+            self.popup = Popup(self, self.font_size)
+
+        filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
+        self.popup.show_image_details(filename, exif)
