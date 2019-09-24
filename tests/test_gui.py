@@ -14,15 +14,15 @@ from gui.photo_app import PhotoFrame
 def test_change_players(qtbot):
     window = PhotoFrame(Config("tests/test_config.yml"))
     assert type(window.get_current_player()) == gui.media_players.PhotoPlayer
-    assert window.get_current_player().get_name() == "Photo Player 1"
+    player1 = window.get_current_player().get_name()
 
     # down
     qtbot.keyPress(window, QtCore.Qt.Key_Down)
-    assert window.get_current_player().get_name() == "Photo Player 2"
+    player2 = window.get_current_player().get_name()
 
-    # up
+    # up - return to original player
     qtbot.keyPress(window, QtCore.Qt.Key_Up)
-    assert window.get_current_player().get_name() == "Photo Player 1"
+    assert window.get_current_player().get_name() == player1
 
 
 def test_cycle_players(qtbot):
