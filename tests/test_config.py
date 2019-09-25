@@ -26,4 +26,4 @@ def test_default_value(config):
 
 def test_missing_file():
     with pytest.raises(FileNotFoundError):
-        config = Config("file_does_not_exist")
+        Config("file_does_not_exist")
