@@ -29,19 +29,19 @@ class Config:
         # data = yaml.dump(config, Dumper=yaml.CDumper)
         # print(data)
 
-    def get_config_value(self, key, dict):
+    def get_config_value(self, key, config_dict):
         default_value = Config.default[key]
         logger.debug("Reading %s (default %s)", key, default_value)
 
-        value = dict.get(key, default_value)
+        value = config_dict.get(key, default_value)
         logger.debug("Config value %s = %s", key, value)
         return value
 
     @staticmethod
-    def _get_config_value(key, dict, default):
+    def _get_config_value(key, config_dict, default):
 
         try:
-            value = dict[key]
+            value = config_dict[key]
         except KeyError:
             logger.debug("Using default for config value %s = %s", key, default)
             return default
