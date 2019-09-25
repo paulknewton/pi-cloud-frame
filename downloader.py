@@ -3,11 +3,17 @@
 import argparse
 import logging
 import sys
-from utils import photo_utils
+
+import yaml
+
 from network.icloud_photos import IcloudPhotos
+from utils import photo_utils
+
+LOG_CONFIG = "logging.yml"
+with open(LOG_CONFIG, 'rt') as f:
+    logging.config.dictConfig(yaml.safe_load(f.read()))
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def main():

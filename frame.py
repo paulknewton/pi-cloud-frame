@@ -1,17 +1,20 @@
 #! /usr/bin/env python3
 
-import logging
+import logging.config
 import sys
 
+import yaml
 from PyQt5 import QtWidgets
 
-from utils.config import Config
 from gui.photo_app import PhotoFrame
+from utils.config import Config
 
-CONFIG_FILE = "config.yml"
+FRAME_CONFIG = "config.yml"
+LOG_CONFIG = "logging.yml"
+with open(LOG_CONFIG, 'rt') as f:
+    logging.config.dictConfig(yaml.safe_load(f.read()))
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
 def main():
@@ -23,7 +26,7 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
 
-    config = Config(CONFIG_FILE)
+    config = Config(FRAME_CONFIG)
 
     try:
         window = PhotoFrame(config)
