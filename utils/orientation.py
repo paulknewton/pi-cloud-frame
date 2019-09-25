@@ -9,9 +9,12 @@ class Compass:
     Sensor to detect rotation of a frame
     """
 
-    def __init__(self, angle, flip=False):
+    def __init__(self, flip=False):
         self.flip = flip
-        self._compass_angle = angle  # default - no rotation (landscape)
+        self._compass_angle = 0  # default - no rotation (landscape)
+
+    def set_angle(self, angle):
+        self._compass_angle = angle
 
     def get_rotation(self):
         """

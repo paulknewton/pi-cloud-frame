@@ -157,7 +157,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
             self.compass = Mpu6050Compass(self.flip_rotation)
         elif self.compass == "fixed":
             from utils.orientation import Compass
-            self.compass = Compass(self.rotation, self.flip_rotation)
+            self.compass = Compass(self.flip_rotation)
+            self.compass.set_angle(self.rotation)
         else:
             self.compass = None
 

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 
 import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtGui import QImage, QPainter
+from PyQt5.QtGui import QImage, QPainter, QGuiApplication
 
 from utils import photo_utils
 
@@ -33,6 +33,10 @@ class AbstractMediaPlayer(ABC):
         # load logo
         self.logo_large = QImage("logo.png")
         self.logo_small = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
+
+        # screen dimensions
+        self.frame_size = QGuiApplication.primaryScreen().geometry().size()
+        logger.info("Frame size = %s", self.frame_size)
 
         self.refresh_media_list()
 
@@ -140,10 +144,10 @@ class AbstractMediaPlayer(ABC):
             logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
             angle_to_rotate_photo = -self.compass.get_rotation_simple()
 
-        logger.debug("Rotating photo by %f", angle_to_rotate_photo
+        logger.debug("Rotating photo by %f", angle_to_rotate_photo)
         self.main_window.setPixmap(QtGui.QPixmap.fromImage(
             self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
-            self.get_main_widget().size() / 2,
+            self.frame_size / 2,
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation))
 
@@ -250,16 +254,16 @@ class PhotoPlayer(AbstractMediaPlayer):
 
         image = QtGui.QImage(image_filename)
         if image:
-            pmap = QtGui.QPixmap.fromImage(image).scaled(
-                self.get_main_widget().size(),
-                QtCore.Qt.KeepAspectRatio,
-                QtCore.Qt.SmoothTransformation)
-
-            # add the watermark
-            self.paint_logo(pmap)
-
-            # rotate AFTER the watermark
+            pmap = QtGui.QPixmap.fromImage(image)
             logger.debug("Rotating photo by %f", angle_to_rotate_photo)
+            logger.debug("Scaling photo to %s", self.frame_size)
+            pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo)).scaled(self.frame_size,
+                                                                                             QtCore.Qt.KeepAspectRatio,
+                                                                                             QtCore.Qt.SmoothTransformation)
+
+            # add the watermark (unrotate, watermark, rotate)
+            pmap = pmap.transformed(QtGui.QTransform().rotate(-angle_to_rotate_photo))
+            self.paint_logo(pmap)
             pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
 
             self.main_window.setPixmap(pmap)
