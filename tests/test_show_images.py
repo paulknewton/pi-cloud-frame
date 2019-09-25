@@ -26,7 +26,7 @@ def pmap_to_pil_img(pmap):
     return Image.open(io.BytesIO(buffer.data()))
 
 
-def test_player_splashscreen(qtbot, window):
+def test_player_splashscreen(_qtbot, window):
     main_widget = window.get_current_player().get_main_widget()
     current_pmap = main_widget.pixmap()
     expected_pmap = QtGui.QPixmap.fromImage(QtGui.QImage("logo.png")).scaled(main_widget.size() / 2,
