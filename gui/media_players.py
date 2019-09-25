@@ -258,6 +258,7 @@ class PhotoPlayer(AbstractMediaPlayer):
             self.paint_logo(pmap)
 
             # rotate AFTER the watermark
+            logger.debug("Rotating photo by %f", angle_to_rotate_photo)
             pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
 
             self.main_window.setPixmap(pmap)
