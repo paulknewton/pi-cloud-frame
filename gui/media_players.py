@@ -249,13 +249,16 @@ class PhotoPlayer(AbstractMediaPlayer):
 
         image = QtGui.QImage(image_filename)
         if image:
-            image = image.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
             pmap = QtGui.QPixmap.fromImage(image).scaled(
                 self.get_main_widget().size(),
                 QtCore.Qt.KeepAspectRatio,
                 QtCore.Qt.SmoothTransformation)
 
+            # add the watermark
             self.paint_logo(pmap)
+
+            # rotate AFTER the watermark
+            pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
 
             self.main_window.setPixmap(pmap)
             return True
