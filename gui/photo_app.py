@@ -96,7 +96,7 @@ class Popup(QDialog):
 
         # centred logo
         logo_label = QLabel(self)
-        logo = QImage("logo_small.png")#.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        logo = QImage("logo_small.png")     #.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
         logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
         layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
 
