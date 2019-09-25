@@ -115,7 +115,7 @@ class Popup(QDialog):
         delete_button = QPushButton("Delete photo", self)
         delete_button.clicked.connect(self.on_click)
 
-        layout.addWidget(delete_button, y + 1, 0, 1, -1)  # span 2 columns
+        layout.addWidget(delete_button, len(self.labels), 0, 1, -1)  # span 2 columns
 
     @pyqtSlot()
     def on_click(self):
@@ -319,7 +319,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             self.prev_player().next()
 
         # click in the centre = raise popup showing photo information
-        elif not popup_closed:
+        else:
             self._popup()
 
     def keyPressEvent(self, key):

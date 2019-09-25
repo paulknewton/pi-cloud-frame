@@ -97,5 +97,5 @@ def test_player_empty_playlist(qtbot):
     :param window:
     :return:
     """
-    return PhotoFrame(Config("tests/test_empty.yml"))
+    window = PhotoFrame(Config("tests/test_empty.yml"))
     assert window.get_current_player().get_playlist() == []

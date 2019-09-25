@@ -20,7 +20,7 @@ class Mpu6050Compass(orientation.Compass):
     bus = smbus.SMBus(1)  # or bus = smbus.SMBus(1) for Revision 2 boards
     address = 0x68  # This is the address value read via the i2cdetect command
 
-    def __init__(self, flip):
+    def __init__(self, flip=False):
         super().__init__(flip)
 
     def get_rotation(self):
