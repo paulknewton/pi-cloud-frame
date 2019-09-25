@@ -23,6 +23,7 @@ def test_change_players(qtbot, window):
     # down
     qtbot.keyPress(window, QtCore.Qt.Key_Down)
     player2 = window.get_current_player().get_name()
+    assert player1 != player2
 
     # up - return to original player
     qtbot.keyPress(window, QtCore.Qt.Key_Up)
@@ -35,6 +36,8 @@ def test_cycle_players(qtbot, window):
     :param qtbot: fixture to trigger window events
     :param window: PhotoFrame widget
     """
+    # YAML file is parsed in different orders on different platforms
+    # so cannot assume 1st player is the 1st instance created. Get the name first
     player1 = window.get_current_player().get_name()
 
     # down x3 - return back to the same player
@@ -42,6 +45,7 @@ def test_cycle_players(qtbot, window):
     qtbot.keyPress(window, QtCore.Qt.Key_Down)
     player3 = window.get_current_player().get_name()
     qtbot.keyPress(window, QtCore.Qt.Key_Down)
+
     assert window.get_current_player().get_name() == player1
 
     # up - cycle back to the end
@@ -79,8 +83,10 @@ def test_player_playlist(qtbot, window):
     media_folder = window.get_current_player().get_folder()
     expected_photos = [media_folder + "/" + s for s in ["1.png", "2.png"]]
 
-    # replace \\ on windows with /
+    # replace \\ with / so test passes on both windows and unix
     current_playlist = [file.replace("\\", "/") for file in window.get_current_player().get_playlist()]
+
+    # different platforms load files in different orders, so sort playlists before comparison
     assert sorted(expected_photos) == sorted(current_playlist)
 
 
