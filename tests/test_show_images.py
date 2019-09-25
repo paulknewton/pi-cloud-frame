@@ -7,7 +7,7 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import QBuffer
 from PyQt5.QtGui import QImage
 
-from gui.config import Config
+from utils.config import Config
 from gui.photo_app import PhotoFrame
 
 

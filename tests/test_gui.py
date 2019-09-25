@@ -2,7 +2,7 @@ import pytest
 from PyQt5 import QtCore
 
 import gui.media_players
-from gui.config import Config
+from utils.config import Config
 from gui.photo_app import PhotoFrame
 
 

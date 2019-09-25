@@ -5,7 +5,7 @@ import sys
 
 from PyQt5 import QtWidgets
 
-from gui.config import Config
+from utils.config import Config
 from gui.photo_app import PhotoFrame
 
 CONFIG_FILE = "config.yml"

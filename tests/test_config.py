@@ -1,6 +1,6 @@
 import pytest
 
-from gui.config import Config
+from utils.config import Config
 
 
 @pytest.fixture
