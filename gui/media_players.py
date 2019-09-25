@@ -140,6 +140,7 @@ class AbstractMediaPlayer(ABC):
             logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
             angle_to_rotate_photo = -self.compass.get_rotation_simple()
 
+        logger.debug("Rotating photo by %f", angle_to_rotate_photo
         self.main_window.setPixmap(QtGui.QPixmap.fromImage(
             self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
             self.get_main_widget().size() / 2,
