@@ -29,7 +29,8 @@ class Config:
         # data = yaml.dump(config, Dumper=yaml.CDumper)
         # print(data)
 
-    def get_config_value(self, key, config_dict):
+    @staticmethod
+    def get_config_value(key, config_dict):
         default_value = Config.default[key]
         logger.debug("Reading %s (default %s)", key, default_value)
 
