@@ -9,7 +9,7 @@ class Config:
     default = {
         "frame": None,  # section containing generic frame parameters
         "slideshow_delay": 5000,  # time between photos (ms)
-        "media_folder": "tmp",  # location of photos under the 'media' folder
+        "root_folder": "tmp",  # location of photos under the 'media' folder
         "font": "12",  # font size for popup menu
         "compass": None,  # if automation detection of frame rotation is support (mpu6050 | fixed)
         "rotation": 0,  # if 'fixed' compass is used, what is the angle of the frame

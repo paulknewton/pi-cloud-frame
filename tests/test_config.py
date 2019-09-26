@@ -12,7 +12,7 @@ def test_simple_lookup(config):
     frame_dict = config.get_config_value("frame", config.root)
     assert frame_dict
 
-    assert config.get_config_value("media_folder", frame_dict) == "tests/test_media"
+    assert config.get_config_value("root_folder", frame_dict) == "tests/test_media"
 
 def test_missing_values(config):
     with pytest.raises(KeyError):

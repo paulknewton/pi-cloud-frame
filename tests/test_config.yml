@@ -1,6 +1,6 @@
 frame:
   slideshow_delay: 3000   # 3 secs
-  media_folder: tests/test_media
+  root_folder: tests/test_media
   compass: fixed
   rotation: 0
 

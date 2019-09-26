@@ -7,9 +7,10 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFont, QImage
+from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
-from gui.media_players import VideoPlayer, PhotoPlayer
+from gui.media_players import PhotoPlayer
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class Popup(QDialog):
 
         # centred logo
         logo_label = QLabel(self)
-        logo = QImage("logo_small.png")     #.scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        logo = QImage("logo_small.png")  # .scaledToWidth(100, QtCore.Qt.SmoothTransformation)
         logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
         layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
 
@@ -138,7 +139,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # instance variables to be read from config file
         self.slideshow_delay = None
-        self.media_folder = None
+        self.root_folder = None
         self.font_size = None
         self.compass = None
         self.flip_rotation = None
@@ -151,7 +152,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.config = config
         self._setup_general_config()
 
-        # setup an accelerometer if frame rotation enable
+        # setup an accelerometer if frame rotation enabled
         if self.compass == "mpu6050":
             from utils.mpu6050 import Mpu6050Compass
             self.compass = Mpu6050Compass(self.flip_rotation)
@@ -162,6 +163,15 @@ class PhotoFrame(QtWidgets.QMainWindow):
         else:
             self.compass = None
 
+        # load logo
+        self.logo_large = QImage("logo.png")
+        self.logo_small = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
+
+        # screen dimensions
+        self.frame_size = QGuiApplication.primaryScreen().geometry().size()
+        logger.info("Frame size = %s", self.frame_size)
+
+        # create frame content
         self._setup_players()
         self._build_ui()
         self.popup = None
@@ -186,8 +196,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.slideshow_delay = int(self.config.get_config_value("slideshow_delay", frame_config))
         logger.info("Slideshow delay = %d", self.slideshow_delay)
 
-        self.media_folder = self.config.get_config_value("media_folder", frame_config)
-        logger.info("Media folder = %s", self.media_folder)
+        self.root_folder = self.config.get_config_value("root_folder", frame_config)
+        logger.info("Media folder = %s", self.root_folder)
 
         self.font_size = int(self.config.get_config_value("font", frame_config))
         logger.info("Font size = %d", self.font_size)
@@ -214,11 +224,18 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.players = []
 
         # iterate through each entry, creating a corresponding media player
-        for item in players_config:
-            if players_config[item]["type"] == "photo_player":
-                player = PhotoPlayer(item, self.media_folder + "/" + players_config[item]["folder"], self.compass)
-            if players_config[item]["type"] == "video_player":
-                player = VideoPlayer(item, self.media_folder + "/" + players_config[item]["folder"], self.compass)
+        for name in players_config:
+            if players_config[name]["type"] == "photo_player":
+                from gui.media_players import PhotoPlayer
+                player = PhotoPlayer(name, self.root_folder + "/" + players_config[name]["folder"], self)
+
+            elif players_config[name]["type"] == "dashboard":
+                from gui.dashboard import FrameDashboard
+                player = FrameDashboard(name, self.compass, self)
+
+            elif players_config[name]["type"] == "video_player":
+                from gui.media_players import VideoPlayer
+                player = VideoPlayer(name, self.root_folder + "/" + players_config[name]["folder"], self)
 
             logger.info("Creating player %s", player.get_name())
             self.players.append(player)
@@ -284,9 +301,11 @@ class PhotoFrame(QtWidgets.QMainWindow):
     def _set_player_by_index(self, index):
         new_player = self.players[index]
         logger.debug("Changing to player index %d (%s)", index, new_player.get_name())
-        self.stack.setCurrentIndex(index)
         self.current_player_index = index
-        # new_player.show_current_media()
+
+        # bring new player to the top and update
+        self.stack.setCurrentIndex(index)
+        new_player.next()
 
     def mousePressEvent(self, mouse):
         """
@@ -351,9 +370,13 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
     def refresh_current_playlist(self):
         logger.info("Refreshing media list for %s", self.get_current_player().get_name())
-        self.get_current_player().refresh_media_list()
+        self.get_current_player()._refresh_media_list()
 
     def _popup(self):
+        # only show popup for photo player
+        if not isinstance(self.get_current_player(), PhotoPlayer):
+            return
+
         logger.debug("Open popup")
         if not self.popup:
             self.popup = Popup(self, self.font_size)

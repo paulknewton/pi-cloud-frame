@@ -1,22 +1,23 @@
 import glob
 import logging
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtGui import QImage, QPainter, QGuiApplication
+from PyQt5.QtGui import QImage, QPainter
 
+from gui.players import PhotoFrameContent
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
 
 
-class AbstractMediaPlayer(ABC):
+class AbstractMediaPlayer(PhotoFrameContent):
     """
     Abstract base class for all media players
     """
 
-    def __init__(self, name, folder, compass):
+    def __init__(self, name, folder, photo_frame):
         """
         Create a default abstract media player.
         All sub-classes should call this constructor.
@@ -24,31 +25,14 @@ class AbstractMediaPlayer(ABC):
         :param name: string used to refer to the media player
         :param folder: folder containing the media (images, video...)
         """
-        self._name = name
-        self.compass = compass
+        super().__init__(name, photo_frame)
+
         self._folder = folder
         self._media_list = None
         self._current_media_index = None
+        self._refresh_media_list()
 
-        # load logo
-        self.logo_large = QImage("logo.png")
-        self.logo_small = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
-
-        # screen dimensions
-        self.frame_size = QGuiApplication.primaryScreen().geometry().size()
-        logger.info("Frame size = %s", self.frame_size)
-
-        self.refresh_media_list()
-
-    @abstractmethod
-    def get_main_widget(self):
-        """
-        Get the top-level widget of the media player
-
-        :return: the top-level widget
-        """
-
-    def refresh_media_list(self):
+    def _refresh_media_list(self):
         """
         Re-load the media list from the filesystem
 
@@ -62,14 +46,6 @@ class AbstractMediaPlayer(ABC):
             self._current_media_index = None
             logger.debug("Reset _current_media_index to None")
         logger.debug("Loaded photo list: %s", self._media_list)
-
-    def get_name(self):
-        """
-        Get the name of the media player
-
-        :return: textual name of the media player
-        """
-        return self._name
 
     def get_folder(self):
         """
@@ -136,21 +112,6 @@ class AbstractMediaPlayer(ABC):
 
         return self._next_or_prev(before_start, jump_to_end, move_to_prev)
 
-    def splash_screen(self):
-        angle_to_rotate_photo = 0
-
-        # detect if frame is rotated
-        if self.compass:
-            logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
-            angle_to_rotate_photo = -self.compass.get_rotation_simple()
-
-        logger.debug("Rotating photo by %f", angle_to_rotate_photo)
-        self.main_window.setPixmap(QtGui.QPixmap.fromImage(
-            self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
-            self.frame_size / 2,
-            QtCore.Qt.KeepAspectRatio,
-            QtCore.Qt.SmoothTransformation))
-
     def paint_logo(self, pmap):
         """
         Overlay the logo on a pixmap
@@ -158,12 +119,12 @@ class AbstractMediaPlayer(ABC):
         """
         painter = QPainter()
         painter.begin(pmap)
-        painter.drawImage(pmap.width() - self.logo_small.width() - 40,
-                          pmap.height() - self.logo_small.height() - 10, self.logo_small)
+        painter.drawImage(pmap.width() - self.photo_frame.logo_small.width() - 40,
+                          pmap.height() - self.photo_frame.logo_small.height() - 10, self.photo_frame.logo_small)
         painter.end()
 
     def _next_or_prev(self, is_boundary, jump, move):
-        self.refresh_media_list()
+        self._refresh_media_list()
 
         invalid_media = True
         ctr = 0
@@ -195,6 +156,9 @@ class VideoPlayer(AbstractMediaPlayer):
     def show_current_media(self):
         pass
 
+    def get_description(self) -> str:
+        return "not implemented"
+
 
 class PhotoPlayer(AbstractMediaPlayer):
 
@@ -221,9 +185,9 @@ class PhotoPlayer(AbstractMediaPlayer):
         exif_orientation = photo_utils.get_file_exif_orientation(image_filename)
 
         # if frame rotation detection is supported, skip portrait network if frame is in landscape mode (and vice versa)
-        if self.compass:
+        if self.photo_frame.compass:
 
-            is_portrait_frame_check = self.compass.is_portrait_frame()
+            is_portrait_frame_check = self.photo_frame.compass.is_portrait_frame()
 
             image = QImage(image_filename)
             if exif_orientation:
@@ -243,8 +207,8 @@ class PhotoPlayer(AbstractMediaPlayer):
             # if we get here, the photo is compatible
 
             # rotate the photo based on the frame orientation
-            logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
-            angle_to_rotate_photo = -self.compass.get_rotation_simple()
+            logger.debug("Frame rotated by %d", self.photo_frame.compass.get_rotation_simple())
+            angle_to_rotate_photo = -self.photo_frame.compass.get_rotation_simple()
 
         # rotate the photo based on the photo EXIF rotation
         if exif_orientation:
@@ -256,10 +220,11 @@ class PhotoPlayer(AbstractMediaPlayer):
         if image:
             pmap = QtGui.QPixmap.fromImage(image)
             logger.debug("Rotating photo by %f", angle_to_rotate_photo)
-            logger.debug("Scaling photo to %s", self.frame_size)
-            pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo)).scaled(self.frame_size,
-                                                                                             QtCore.Qt.KeepAspectRatio,
-                                                                                             QtCore.Qt.SmoothTransformation)
+            logger.debug("Scaling photo to %s", self.photo_frame.frame_size)
+            pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo)).scaled(
+                self.photo_frame.frame_size,
+                QtCore.Qt.KeepAspectRatio,
+                QtCore.Qt.SmoothTransformation)
 
             # add the watermark (unrotate, watermark, rotate)
             pmap = pmap.transformed(QtGui.QTransform().rotate(-angle_to_rotate_photo))
@@ -271,3 +236,6 @@ class PhotoPlayer(AbstractMediaPlayer):
 
         logger.info("Could not load image: %s", image_filename)
         return False
+
+    def get_description(self) -> str:
+        return "folder = %s; # photos = %d" % (self.get_folder(), len(self.get_playlist()))

@@ -76,3 +76,6 @@ class Mpu6050Compass(orientation.Compass):
         radians = math.atan2(y, Mpu6050Compass.dist(x, z))
 
         return math.degrees(radians)
+
+    def get_description(self) -> str:
+        return "MPU-6050 accelerometer"

@@ -54,3 +54,6 @@ class Compass:
         :return: True if landscape mode, False if portrait mode
         """
         return not self.is_portrait_frame()
+
+    def get_description(self) -> str:
+        return "fixed compass"
