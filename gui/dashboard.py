@@ -16,29 +16,23 @@ class FrameDashboard(PhotoFrameContent):
         super().__init__(name, compass)
         self.photo_frame = photo_frame
 
-        self.main_window = QtWidgets.QLabel()
-        # Need to set the alignment here even if a layout is used further down
-        # because the splash screen is set on the label directly
-        self.main_window.setAlignment(QtCore.Qt.AlignCenter)
+        self.main_window = QtWidgets.QWidget(self.photo_frame)
+        self.main_window.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        self.main_window.setFixedSize(self.photo_frame.frame_size)
 
         # Create a label to contain the dashboard text.
-        # This is separate from the main window so it can be lef-aligned, but centred
-        self.db_content = QtWidgets.QLabel()
-        self.db_content.setAlignment(QtCore.Qt.AlignLeft)
-
-        # size should not be dependent on the text label
-        self.db_content.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self.db_content.setFixedSize(self.photo_frame.width() / 2, self.photo_frame.height())
+        # This is separate from the main window so it can be left-aligned, but centred
+        self.db_content = QtWidgets.QLabel(self.main_window)
+        self.db_content.setAlignment(QtCore.Qt.AlignCenter)
 
         # centre the label
-        layout = QtWidgets.QVBoxLayout(self.photo_frame)
+        layout = QtWidgets.QGridLayout(self.main_window)
         layout.setAlignment(QtCore.Qt.AlignHCenter)
         self.main_window.setLayout(layout)
         layout.addWidget(self.db_content)
 
     def get_main_widget(self):
-        # return the main window because this is used for the splash screen
-        return self.main_window
+        return self.db_content
 
     def _update(self):
         dashboard_entries = [
@@ -57,11 +51,12 @@ class FrameDashboard(PhotoFrameContent):
                              self.photo_frame.players]
 
         dashboard_text = "<br>".join(dashboard_entries)
-        logger.info(dashboard_text)
+        logger.debug(dashboard_text)
 
-        # clear the splash screen from the main window (if any)
-        self.main_window.clear()
-
+        # set size to only use part of the screen, and align left
+        self.db_content.setAlignment(QtCore.Qt.AlignLeft)
+        self.db_content.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        self.db_content.setFixedSize(self.photo_frame.width() * 0.7, self.photo_frame.height())
         self.db_content.setText(dashboard_text)
 
     def next(self):

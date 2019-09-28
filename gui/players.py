@@ -45,7 +45,7 @@ class PhotoFrameContent(ABC):
             angle_to_rotate_photo = -self.photo_frame.compass.get_rotation_simple()
 
         logger.debug("Rotating photo by %f", angle_to_rotate_photo)
-        self.main_window.setPixmap(QtGui.QPixmap.fromImage(
+        self.get_main_widget().setPixmap(QtGui.QPixmap.fromImage(
             self.photo_frame.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
             self.photo_frame.frame_size / 2,
             QtCore.Qt.KeepAspectRatio,
