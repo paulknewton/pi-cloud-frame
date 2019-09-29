@@ -20,6 +20,7 @@ FRAME_PROFILE=$3
 ALBUM=$4
 SAMPLE_SIZE=$5
 
+### EDIT THIS SECTION TO ADD YOUR PHOTO FRAME ###
 case $3 in
     # original nixplay frame
     nixplay1)
@@ -56,7 +57,7 @@ case $3 in
         echo Unknown profile $3. Exiting.
         exit 1
 esac
-
+#################################################
 
 ROOT=`pwd`
 
