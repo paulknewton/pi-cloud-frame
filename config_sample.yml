@@ -1,9 +1,11 @@
 frame:
     slideshow_delay: 30000
-    media_folder: media
+    root_folder: media
     font: 14
     compass: mpu6050
     flip_rotation: true
+    shuffle: true
+
 
 players:
     Photo Player:

@@ -10,7 +10,8 @@ from PyQt5.QtGui import QFont, QImage
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
 
-from gui.media_players import PhotoPlayer
+from gui.media_players import PhotoPlayer, VideoPlayer
+from gui.dashboard import FrameDashboard
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
@@ -211,6 +212,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.flip_rotation = self.config.get_config_value("flip_rotation", frame_config)
         logger.info("Flip Rotation = %s", self.flip_rotation)
 
+        self.shuffle = self.config.get_config_value("shuffle", frame_config)
+        logger.info("Shuffle = %s", self.shuffle)
+
     def _setup_players(self):
         """
         Factory method to create the set of media players
@@ -227,19 +231,25 @@ class PhotoFrame(QtWidgets.QMainWindow):
         for name in players_config:
             if players_config[name]["type"] == "photo_player":
                 from gui.media_players import PhotoPlayer
-                player = PhotoPlayer(name, self.root_folder + "/" + players_config[name]["folder"], self)
+                player = PhotoPlayer(name, self.root_folder + "/" + self.config.get_config_value("folder",
+                                                                                                 players_config[name]),
+                                     self,
+                                     self.config.get_config_value("shuffle", players_config[name]))
 
             elif players_config[name]["type"] == "dashboard":
-                from gui.dashboard import FrameDashboard
                 player = FrameDashboard(name, self.compass, self)
 
             elif players_config[name]["type"] == "video_player":
-                from gui.media_players import VideoPlayer
-                player = VideoPlayer(name, self.root_folder + "/" + players_config[name]["folder"], self)
+                # TODO - replace instance call with static method call
+                player = VideoPlayer(name,
+                                     self.root_folder + "/" + self.config.get_config_value("folder",
+                                                                                           players_config[name]),
+                                     self,
+                                     self.config.get_config_value("shuffle", players_config[name]))
 
             logger.info("Creating player %s", player.get_name())
             self.players.append(player)
-        self.current_player_index = 0
+            self.current_player_index = 0
 
     def next_player(self):
         """

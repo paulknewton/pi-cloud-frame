@@ -1,0 +1,7 @@
+frame:
+  root_folder: tests/test_media
+
+players:
+  Photo Player No Shuffle:
+    type: photo_player
+    folder: navigation
