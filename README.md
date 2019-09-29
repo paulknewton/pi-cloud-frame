@@ -48,7 +48,7 @@ Let's look at the final result before we go into any details: the Pi Cloud Frame
 
 And here it is in action:
 
-![menus](img/menus.png)
+![pi_cloud_frame2](img/pi_cloud_frame2.png)
 
 ## Installing the code
 
@@ -210,15 +210,15 @@ One last step: if you want to launch the viewer via the touchscreen, there is a 
 
 If you want to make a pi cloud frame like the one in the picture above, this is how I went about it.
 
-The heart of the frame is a Raspberry Pi 3+ Model A (I went for the Model A over the Model B because it is smaller and uses less power. And yes, cheaper as well!).
+The heart of the frame is a [Raspberry Pi 3+ Model A](https://www.raspberrypi.org/products/raspberry-pi-3-model-a-plus/) (I went for the Model A over the Model B because it is smaller and uses less power. And yes, cheaper as well!).
 
-![raspberry_pi](raspberry_pi.png)
+![raspberry_pi](https://www.raspberrypi.org/homepage-9df4b/static/8795b79dd0383fbbbe07f341744d1a20/bc3a8/b40e688ee64045b006cfe7875da3c42eb2d4bfe1_3a-1-1633x1080.jpg)
 
-The Pi is mounted on to the official Raspberry Pi display and responds to touches on the touchscreen for navigating back/forwards, bringing up popup menus or changing the slideshow (see above). I did look at other display options: an old monitor from eBay, or maybe some other Pi-compatible display. But really, I would stick with the official display - it is well-made, reasonably priced, supportes touchscreen, and...it just works.
+The Pi is mounted on to the [official Raspberry Pi display](https://www.raspberrypi.org/products/raspberry-pi-touch-display) and responds to touches on the touchscreen for navigating back/forwards, bringing up popup menus or changing the slideshow (see above). I did look at other display options: an old monitor from eBay, or maybe some other Pi-compatible display. But really, I would stick with the official display - it is well-made, reasonably priced, supportes touchscreen, and...it just works.
 
-![pi_display](pi_display.png)
+![pi_display](https://www.raspberrypi.org/homepage-9df4b/static/cb885a883088cfe5667619be30020185/bc3a8/432cfd901a27d4bbbddb761269547cedf4aa4c1b_display-kit-1-1510x1080.jpg)
 
-Once the Pi was hooked up to the screen, I squeezed it all inside an Ikea photo frame. I actually bought a few different frame sizes at the same time. I only used the largest frame, but the other cardboard covers came in handy to place over the display and hide the edges. The Ikea frames are cheap and just about thick enough to accomodate a Pi display with a Pi stuck on the back. I had to offset the Pi on the back of the display and flip it over so the GPIO pins did not bend against the frame back. You can experiment to get it to fit.
+Once the Pi was hooked up to the screen, I squeezed it all inside an [Ikea](https://www.ikea.com) photo frame. I actually bought a few different frame sizes at the same time. I only used the largest frame, but the other cardboard covers came in handy to place over the display and hide the edges. The Ikea frames are cheap and just about thick enough to accomodate a Pi display with a Pi stuck on the back. I had to offset the Pi on the back of the display and flip it over so the GPIO pins did not bend against the frame back. You can experiment to get it to fit.
 
 ![ikea](img/ikea.png)
 
@@ -228,7 +228,7 @@ The hardest part was preventing the Pi from sliding around inside the frame. I e
 
 Before sealing up the frame, you may want to install an acclerometer like this MPU-6050:
 
-![mpu6050](img/mpu6050.png)
+![mpu6050](img/mpu6050.jpg)
 
 These only cost a few euros and allow the frame to detect which way up it is. The photo display software uses this to automatically rotate the photos.
 
@@ -251,4 +251,4 @@ You can schedule this with a simple ```cron``` job (off at midnight, back on at 
 30 6 * * * /home/pi/pi-cloud-frame/bin/display on
 ```
 
-And that's it. Hope you start re-discovering all of your old photos. I did!
+And that's it. Hope you start re-discovering all of your old photos. I certainly did!
