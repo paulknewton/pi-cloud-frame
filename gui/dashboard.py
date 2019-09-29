@@ -3,7 +3,7 @@ import logging
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QSizePolicy
 
-import gui.photo_app
+# import gui.photo_app
 from gui.players import PhotoFrameContent
 import utils.orientation
 
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class FrameDashboard(PhotoFrameContent):
 
-    def __init__(self, name: str, compass: utils.orientation.Compass, photo_frame: gui.photo_app.PhotoFrame):
+    def __init__(self, name: str, compass: utils.orientation.Compass, photo_frame):
         super().__init__(name, compass)
         self.photo_frame = photo_frame
 

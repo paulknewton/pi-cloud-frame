@@ -1,3 +1,4 @@
+import random
 import glob
 import logging
 from abc import abstractmethod
@@ -17,19 +18,24 @@ class AbstractMediaPlayer(PhotoFrameContent):
     Abstract base class for all media players
     """
 
-    def __init__(self, name, folder, photo_frame):
+    def __init__(self, name, folder, photo_frame, shuffle):
         """
         Create a default abstract media player.
         All sub-classes should call this constructor.
 
         :param name: string used to refer to the media player
         :param folder: folder containing the media (images, video...)
+        :param shuffle: toggle random slidedown
+        :param photo_frame: reference to the photo frame
         """
         super().__init__(name, photo_frame)
 
         self._folder = folder
+        self._shuffle = shuffle
         self._media_list = None
-        self._current_media_index = None
+        self.current_media_index = None
+        self.browsing_history = []
+
         self._refresh_media_list()
 
     def _refresh_media_list(self):
@@ -42,8 +48,8 @@ class AbstractMediaPlayer(PhotoFrameContent):
         self._media_list = glob.glob(self.get_folder() + "/*")
 
         # leave index unchanged if possible (to allow playlist to be refreshed without side-effect of jumping to start
-        if self._current_media_index and self._current_media_index >= len(self._media_list):
-            self._current_media_index = None
+        if self.current_media_index and self.current_media_index >= len(self._media_list):
+            self.current_media_index = None
             logger.debug("Reset _current_media_index to None")
         logger.debug("Loaded photo list: %s", self._media_list)
 
@@ -72,11 +78,11 @@ class AbstractMediaPlayer(PhotoFrameContent):
 
     def get_current_media_exif(self):
         # make sure we have a list of media and a current pointer
-        if not all([self._media_list, self._current_media_index]):
+        if not all([self._media_list, self.current_media_index]):
             # self.main_window.setText("Media Player %s: No media to show" % self.get_name())
             return None, None
 
-        image_filename = self._media_list[self._current_media_index]
+        image_filename = self._media_list[self.current_media_index]
         with open(image_filename, 'rb') as f:
             return image_filename, exifread.process_file(f, details=False)
 
@@ -85,32 +91,56 @@ class AbstractMediaPlayer(PhotoFrameContent):
         Display the next media. If at the end of the playlist, jump to the start
         """
 
-        def passed_end(i, l):
-            return i >= len(l) - 1
+        def at_end(i, media_list):
+            return i >= len(media_list) - 1
 
-        def jump_to_start(_unused_i, _unused_l):
+        def jump_to_start(_unused_i, _unused_media_list):
             return 0
 
-        def move_to_next(i):
+        def move_to_next(i, _unused_media_list):
             return i + 1
 
-        return self._next_or_prev(passed_end, jump_to_start, move_to_next)
+        def random_jump(_unused_i, media_list):
+            return random.randint(0, len(media_list) - 1)
+
+        if self._shuffle:
+            logger.debug("Getting random photo")
+            return self._move(lambda x, y: False, random_jump, random_jump)
+
+        logger.info("Moving to next photo")
+        self._move(at_end, jump_to_start, move_to_next)
 
     def prev(self):
+        """
+        Display the previously visited media. Stop when we get to the start of the browsing history.
+        """
+        # remove current entry from history
+        if self.browsing_history:
+            self.browsing_history.pop()
+
+        # jump to the previous entry (if any)
+        if self.browsing_history:
+            self.current_media_index = self.browsing_history[-1]
+            self.show_current_media()
+        else:
+            logger.debug("No more browsing history")
+            self.current_media_index = None
+
+    def old_prev(self):
         """
         Display the previous media. If at the start of the playlist, jump to the end
         """
 
-        def before_start(i, _unused_l):
+        def before_start(i, _unused_media_list):
             return i <= 0
 
-        def jump_to_end(_unused_i, l):
-            return len(l) - 1
+        def jump_to_end(_unused_i, media_list):
+            return len(media_list) - 1
 
-        def move_to_prev(i):
+        def move_to_prev(i, _unused_media_list):
             return i - 1
 
-        return self._next_or_prev(before_start, jump_to_end, move_to_prev)
+        return self._move(before_start, jump_to_end, move_to_prev)
 
     def paint_logo(self, pmap):
         """
@@ -123,7 +153,7 @@ class AbstractMediaPlayer(PhotoFrameContent):
                           pmap.height() - self.photo_frame.logo_small.height() - 10, self.photo_frame.logo_small)
         painter.end()
 
-    def _next_or_prev(self, is_boundary, jump, move):
+    def _move(self, is_boundary, jump, move):
         self._refresh_media_list()
 
         invalid_media = True
@@ -132,17 +162,21 @@ class AbstractMediaPlayer(PhotoFrameContent):
             # prevent looping forever in case no images match
             logger.debug("ctr = %d", ctr)
 
-            logger.debug("_current_media_index = %s", self._current_media_index)
+            logger.debug("_current_media_index = %s", self.current_media_index)
             logger.debug("length _media_list = %d", len(self._media_list))
-            if self._current_media_index is None or is_boundary(self._current_media_index, self._media_list):
+
+            if self.current_media_index is None or is_boundary(self.current_media_index, self._media_list):
                 logger.debug("Jumping to other end of media list")
-                self._current_media_index = jump(self._current_media_index, self._media_list)
+                self.current_media_index = jump(self.current_media_index, self._media_list)
             else:
                 logger.debug("Moving to neighbouring media item")
-                self._current_media_index = move(self._current_media_index)
+                self.current_media_index = move(self.current_media_index, self._media_list)
 
             invalid_media = not self.show_current_media()
             ctr += 1
+
+        # update the browsing history
+        self.browsing_history.append(self.current_media_index)
 
 
 class VideoPlayer(AbstractMediaPlayer):
@@ -171,6 +205,8 @@ class PhotoPlayer(AbstractMediaPlayer):
         return self.main_window
 
     def show_current_media(self):
+        logger.debug("Showing media %d", self.current_media_index)
+
         if not self._media_list:
             self.main_window.setText("Media Player %s: No media to show" % self.get_name())
             return True
@@ -178,7 +214,7 @@ class PhotoPlayer(AbstractMediaPlayer):
         angle_to_rotate_photo = 0
 
         # load image from the file
-        image_filename = self._media_list[self._current_media_index]
+        image_filename = self._media_list[self.current_media_index]
         logger.debug("Loading image %s", image_filename)
 
         # we alwways need this (even to discard incompatible network) so check now

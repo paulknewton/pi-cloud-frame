@@ -14,6 +14,7 @@ class Config:
         "compass": None,  # if automation detection of frame rotation is support (mpu6050 | fixed)
         "rotation": 0,  # if 'fixed' compass is used, what is the angle of the frame
         "flip_rotation": False,  # rotation values are inverted to handle upside down accelerometer
+        "shuffle": False,  # shuffle slideshow
         "players": None  # section containing configuration of media players
     }
 
@@ -31,20 +32,21 @@ class Config:
 
     @staticmethod
     def get_config_value(key, config_dict):
-        default_value = Config.default[key]
-        logger.debug("Reading %s (default %s)", key, default_value)
+        # get a default value (if any)
+        default_value = Config.default.get(key, None)
 
+        logger.debug("Reading %s (default %s)", key, default_value)
         value = config_dict.get(key, default_value)
         logger.debug("Config value %s = %s", key, value)
         return value
 
-    @staticmethod
-    def _get_config_value(key, config_dict, default):
 
-        try:
-            value = config_dict[key]
-        except KeyError:
-            logger.debug("Using default for config value %s = %s", key, default)
-            return default
+@staticmethod
+def _get_config_value(key, config_dict, default):
+    try:
+        value = config_dict[key]
+    except KeyError:
+        logger.debug("Using default for config value %s = %s", key, default)
+        return default
 
-        return value
+    return value
