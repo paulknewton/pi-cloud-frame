@@ -4,13 +4,17 @@ frame:
     font: 14
     compass: mpu6050
     flip_rotation: true
-    shuffle: true
-
 
 players:
-    Photo Player:
+   Holiday Photo Player:
         type: photo_player
-        folder: photos
-    Video Player:
-        type: video_player
-        folder: video
+        folder: italy
+		shuffle: true
+        
+    Family Photo Player:
+        type: photo_player
+        folder: personal
+		shuffle: false
+        
+    My dashboard:
+        type: dashboard
