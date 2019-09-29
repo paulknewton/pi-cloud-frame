@@ -64,6 +64,8 @@ And here it is in action:
 
 ![pi_cloud_frame2](img/pi_cloud_frame2.png)
 
+![menu](img/menu.png)
+
 ## Installing the code
 
 The main code to download photos is written in python, using the [pyicloud](https://github.com/picklepete/pyicloud) library. This library provides a clean API to access the iCloud and download photos (or anything else actually). The current version does not support the latest 2-phase authentication introduced by Apple, so you will need to [use this patched version instead](https://github.com/PeterHedley94/pyicloud).
@@ -236,9 +238,9 @@ Once the Pi was hooked up to the screen, I squeezed it all inside an [Ikea](http
 
 ![ikea](img/ikea.png)
 
+Remember to leave out the glass (actually, Ikea uses clear plastic instead) otherwise the touchscreen won't work.
 The hardest part was preventing the Pi from sliding around inside the frame. I envisaged all kinds of complex fixings, but in the end grabbed a cardboard box from a well-known e-commerce company and made a bunch of wedges around the sides. So far, it works like a charm.
 
-![cardboard](img/cardboard.png)
 
 Before sealing up the frame, you may want to install an acclerometer like this MPU-6050:
 
@@ -248,8 +250,10 @@ These only cost a few euros and allow the frame to detect which way up it is. Th
 
 And finally...seal up the frame with some masking tape on the back to stop everything falling out. And we are ready to go.
 
+![tape](img/tape.png)
+
 ## Sending the frame to sleep
-I have the frame working all day, cycling from 1 photo to the next. During the nighttime I switch off the display (but the Pi keeps running) via the ```display``` command:
+I have the frame working all day, cycling from 1 photo to the next. During the night time I switch off the display (but the Pi keeps running) via the ```display``` command:
 
 ```
 ./bin/display off
