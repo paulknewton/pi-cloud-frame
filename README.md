@@ -8,6 +8,20 @@
 An icloud-powered digital frame running on a Raspberry Pi.
 Downloads a random sample of photos from your icloud account, crops them to the correct aspect ratio and displays them. Supports parallel slideshows, interactive menus, GPS/EXIF lookup and auto rotation via a MPU-6050 accelerometer.
 
+<!-- toc -->
+
+- [What is it?](#what-is-it)
+- [The final results: Pi Cloud Frame](#the-final-results-pi-cloud-frame)
+- [Installing the code](#installing-the-code)
+- [Running the code](#running-the-code)
+  * [Downloading the photos](#downloading-the-photos)
+  * [Displaying the photos](#displaying-the-photos)
+- [Using the viewer](#using-the-viewer)
+- [Making the frame](#making-the-frame)
+- [Sending the frame to sleep](#sending-the-frame-to-sleep)
+
+<!-- tocstop -->
+
 ## What is it?
 
 Like most people, I have a digital photo frame at home.
