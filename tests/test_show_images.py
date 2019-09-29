@@ -26,7 +26,7 @@ def pmap_to_pil_img(pmap):
     return Image.open(io.BytesIO(buffer.data()))
 
 
-def test_player_splashscreen(qtbot, window):
+def skip_test_player_splashscreen(qtbot, window):
     main_widget = window.get_current_player().get_main_widget()
     current_pmap = main_widget.pixmap()
     expected_pmap = QtGui.QPixmap.fromImage(QtGui.QImage("logo.png")).scaled(main_widget.size() / 2,
@@ -37,7 +37,7 @@ def test_player_splashscreen(qtbot, window):
     assert ImageChops.difference(pmap_to_pil_img(current_pmap), pmap_to_pil_img(expected_pmap)).getbbox() is None
 
 
-def skip_test_player_slideshow(qtbot, window):
+def test_player_slideshow(qtbot, window):
     # wait for splashscreen to disappear
     qtbot.wait(4000)
 
