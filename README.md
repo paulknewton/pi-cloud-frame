@@ -6,22 +6,36 @@
 ![logo_medium](logo_medium.png)
 
 An icloud-powered digital frame running on a Raspberry Pi.
-Downloads a random sample of photos from your icloud account and displays them. Supports parallel slideshows, interactive menus, GPS/EXIF lookup and auto rotation via MPU-6050 accelerometers.
+Downloads a random sample of photos from your icloud account, crops them to the correct aspect ratio and displays them. Supports parallel slideshows, interactive menus, GPS/EXIF lookup and auto rotation via a MPU-6050 accelerometer.
 
 ## What is it?
 
-Like most people, I have a digitial photo frame at home. In my case, a beautiful Nixplay display that includes lots of fancy cloud integration. Photos can be uploaded remotely, synchronised from various sources. It even has its own email address!
+Like most people, I have a digitial photo frame at home.
+In my case, a beautiful Nixplay display that includes lots of fancy cloud integration.
+Photos can be uploaded remotely and synchronised from various sources. It even has its own email address!
 
 I am really happy with this frame. The display quality is excellent and for the most part, I haven't had any issues with it.
 
-But there were a few things that I really missed:
-* no icloud support - all of my photos are stored in the Apple icloud, but the only way to sync photos to Nixplay is to copy them to some other supported platform like Dropbox
+But there were a few things that I really miss:
+* no icloud support - all of my photos are stored in the Apple icloud, but the only way to sync photos to Nixplay is to copy them to some other supported platform like Dropbox.
 
-* no auto-cropping - the frame uses 16:9 aspect ratio while most of my photos are 3:2. I have to manually crop these to get them to fit the frame
+* no auto-cropping - the frame uses 16:9 aspect ratio while most of my photos are 3:2. I have to manually crop these to get them to fit the frame.
 
 * no automatic syncing of new photos - all photos need to be manually pushed to the digital frame. This means more manual effort for adding new photos. And uploading the many 1000s of photos I have accumulated over the years is pretty much out of the question. (UDPATE: Nixplay now support [Dynamic Playlists](https://blog.nixplay.com/2018/10/nixplays-dynamic-playlists-explained) from Google Photos and Dropbox)
 
-This python code tries to address all of the limitations above. It downloads a random sample of photos from an icloud account (you can specify which album) and crops these to the correct aspect. The photos are periodically cleared out and refreshed as required. The photo display software is written in Qt5 and shows the photos in sequence. It also supports the idea of 'stacked' photo viewers (a list of slideshows that you can switch between).
+All of this means that it becomes a bit of a pain to add photos to my photo frame.
+I end up leaving the same set of photos on endless rotation like some old MTV playlist, and all my other photos sit on a remote disk somewhere, gathering digital dust.
+
+This python code tries to solve all of these problems and help to unlock my 1000s of digital photos.
+It downloads a random sample of photos from an icloud account (you can specify which album) and automatically crops these to the correct aspect ratio (based on the target photo frame).
+The photos are automatically transferred to a Nixplay frame (via Dropbox) or stored in a folder for access by a pi-cloud-frame (running on a Raspberry Pi).
+
+The photo display software runs on a Raspberry Pi connected to an official Pi display (although it could run on anything). The software supports simple photo slideshows, random shuffle but also lots of extras like:
+* 'Stacked' photo viewers to allow multiple slideshows to be setup in parallel. The user can jump between slideshows at any time by touching the screen.
+* Embedded custom widgets (currently a system dashboard, but others are in the pipeline such as a video player)
+* Auto-detect frame orientation and skip non-matching photos (landscape/portrait)
+* Interactively delete unwanted photos
+* Show meta-information about each photo (date, filename, location of GPS location)
 
 Everything runs on a Raspberry Pi attached to one of the official displays. But you can run this on any Linux box really. The download part can be used without the front-end application (e.g. to download icloud photos for other photos frames).
 
