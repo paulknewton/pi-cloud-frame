@@ -78,7 +78,7 @@ class AbstractMediaPlayer(PhotoFrameContent):
 
     def get_current_media_exif(self):
         # make sure we have a list of media and a current pointer
-        if not all([self._media_list, self.current_media_index]):
+        if None in [self._media_list, self.current_media_index]:
             # self.main_window.setText("Media Player %s: No media to show" % self.get_name())
             return None, None
 
