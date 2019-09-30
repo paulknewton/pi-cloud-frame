@@ -52,5 +52,9 @@ class PhotoFrameContent(ABC):
             QtCore.Qt.SmoothTransformation))
 
     @staticmethod
+    def get_properties(self):
+        pass
+
+    @staticmethod
     def get_description(self):
         pass

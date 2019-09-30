@@ -1,11 +1,11 @@
+from typing import List
 import logging
 
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QSizePolicy
 
-# import gui.photo_app
-from gui.players import PhotoFrameContent
 import utils.orientation
+from gui.players import PhotoFrameContent
 
 logger = logging.getLogger(__name__)
 
@@ -17,47 +17,90 @@ class FrameDashboard(PhotoFrameContent):
         self.photo_frame = photo_frame
 
         self.main_window = QtWidgets.QWidget(self.photo_frame)
-        self.main_window.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self.main_window.setFixedSize(self.photo_frame.frame_size)
+        # self.main_window.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        # self.main_window.setFixedSize(self.photo_frame.frame_size)
 
-        # Create a label to contain the dashboard text.
-        # This is separate from the main window so it can be left-aligned, but centred
-        self.db_content = QtWidgets.QLabel(self.main_window)
-        self.db_content.setAlignment(QtCore.Qt.AlignCenter)
+        self.summary_widget = None
+        self.player_list_widget = None
 
-        # centre the label
-        layout = QtWidgets.QGridLayout(self.main_window)
-        layout.setAlignment(QtCore.Qt.AlignHCenter)
-        self.main_window.setLayout(layout)
-        layout.addWidget(self.db_content)
+        self._build_ui()
+
+    def _build_ui(self):
+        main_layout = QtWidgets.QVBoxLayout(self.main_window)
+        main_layout.setAlignment(QtCore.Qt.AlignHCenter)
+        self.main_window.setLayout(main_layout)
+
+        no_vstretch_policy = QSizePolicy()
+        no_vstretch_policy.setVerticalStretch(0)
+        # no_vstretch_policy.setHorizontalPolicy(QSizePolicy.Fixed)
+
+        heading = QtWidgets.QLabel(self.main_window)
+        heading.setAlignment(QtCore.Qt.AlignCenter)
+        heading.setText("<p><b>Dashboard</b><p><hr>")
+        heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
+        heading.setSizePolicy(no_vstretch_policy)
+        main_layout.addWidget(heading)
+
+        summary_frame = QtWidgets.QFrame()
+        summary_frame.setFrameStyle(QtWidgets.QFrame.Panel)
+        summary_frame_layout = QtWidgets.QVBoxLayout(summary_frame)
+        summary_frame.setLayout(summary_frame_layout)
+        summary_frame.setSizePolicy(no_vstretch_policy)
+        summary_frame.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
+
+        self.summary_widget = QtWidgets.QLabel(summary_frame)
+        self.summary_widget.setAlignment(QtCore.Qt.AlignLeft)
+        summary_frame_layout.addWidget(self.summary_widget)
+
+        main_layout.addWidget(summary_frame)
+
+        player_frame = QtWidgets.QFrame()
+        player_frame.setFrameStyle(QtWidgets.QFrame.Panel)
+        player_frame_layout = QtWidgets.QVBoxLayout(player_frame)
+        player_frame.setLayout(player_frame_layout)
+
+        self.player_list_widget = QtWidgets.QLabel(player_frame)
+        self.player_list_widget.setAlignment(QtCore.Qt.AlignLeft)
+        player_frame_layout.addWidget(self.player_list_widget)
+
+        main_layout.addWidget(player_frame)
+
+        self._update_summary()
+        self._update_player_list()
 
     def get_main_widget(self):
-        return self.db_content
+        return self.main_window
+
+    def _update_summary(self):
+        summary_entries = [
+            "<b>Number of players:</b> %d" % len(self.photo_frame.players),
+            "<b>Slideshow delay:</b> %d" % self.photo_frame.slideshow_delay,
+            "<b>Root folder:</b> %s" % self.photo_frame.root_folder,
+            "<b>Compass:</b> %s" % self.photo_frame.compass.get_description(),
+            "<b>Flip rotation:</b> %s" % self.photo_frame.flip_rotation
+        ]
+        summary_text = "<br>".join(summary_entries)
+        logger.debug(summary_text)
+
+        # self.db_content.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+        # self.db_content.setFixedSize(self.photo_frame.width() * 0.7, self.photo_frame.height())
+        self.summary_widget.setText(summary_text)
+
+    def _update_player_list(self):
+        player_list_entries = ["<b>Player list:</b>"] + [self._get_player_entry(player) for player in
+                                                         self.photo_frame.players]
+        player_list_text = "<br>".join(player_list_entries)
+        logger.info(player_list_text)
+        self.player_list_widget.setText(player_list_text)
+
+    def _get_player_entry(self, player: PhotoFrameContent):
+        properties = ["<li>%s</li>" % p for p in player.get_properties()]
+        return "<b>%s</b> - %s<ul>" % (player.get_name(), player.get_description()) + "".join(properties) + "</ul>"
 
     def _update(self):
-        dashboard_entries = [
-                                "<b>Dashboard</b><p>",
-                                "<hr>",
-                                "<b>Number of players:</b> %d" % len(self.photo_frame.players),
-                                "<b>Slideshow delay:</b> %d" % self.photo_frame.slideshow_delay,
-                                "<b>Root folder:</b> %s" % self.photo_frame.root_folder,
-                                "<b>Compass:</b> %s" % self.photo_frame.compass.get_description(),
-                                "<b>Flip rotation:</b> %s" % self.photo_frame.flip_rotation,
-                                "<hr>",
-                                "<br><b>Player list:</b>",
-                                "<ul>"
-                            ] + \
-                            ["<li><b>%s</b> : %s</li>" % (player.get_name(), player.get_description()) for player in
-                             self.photo_frame.players]
-
-        dashboard_text = "<br>".join(dashboard_entries)
-        logger.debug(dashboard_text)
-
-        # set size to only use part of the screen, and align left
-        self.db_content.setAlignment(QtCore.Qt.AlignLeft)
-        self.db_content.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
-        self.db_content.setFixedSize(self.photo_frame.width() * 0.7, self.photo_frame.height())
-        self.db_content.setText(dashboard_text)
+        logger.debug("Updating dashboard")
+        self._update_summary()
+        self._update_player_list()
 
     def next(self):
         self._update()
@@ -65,5 +108,8 @@ class FrameDashboard(PhotoFrameContent):
     def prev(self):
         self._update()
 
-    def get_description(self):
-        return "-"
+    def get_properties(self) -> List[str]:
+        return ["-"]
+
+    def get_description(self) -> str:
+        return "a system dashboard to show the current state of the photo frame"

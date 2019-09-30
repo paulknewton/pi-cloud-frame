@@ -1,7 +1,8 @@
-import random
 import glob
 import logging
+import random
 from abc import abstractmethod
+from typing import List
 
 import exifread
 from PyQt5 import QtWidgets, QtCore, QtGui
@@ -190,8 +191,11 @@ class VideoPlayer(AbstractMediaPlayer):
     def show_current_media(self):
         pass
 
+    def get_properties(self) -> List[str]:
+        return ["not implemented"]
+
     def get_description(self) -> str:
-        return "not implemented"
+        return "a video player"
 
 
 class PhotoPlayer(AbstractMediaPlayer):
@@ -273,5 +277,12 @@ class PhotoPlayer(AbstractMediaPlayer):
         logger.info("Could not load image: %s", image_filename)
         return False
 
+    def get_properties(self) -> List[str]:
+        return [
+            "folder = %s" % self.get_folder(),
+            "# photos = %d" % len(self.get_playlist()),
+            "shuffle = %s" % self._shuffle
+        ]
+
     def get_description(self) -> str:
-        return "folder = %s; # photos = %d" % (self.get_folder(), len(self.get_playlist()))
+        return "a photo viewer for showing photo slideshows"
