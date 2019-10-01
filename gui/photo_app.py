@@ -8,10 +8,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QFont, QImage
 from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton
+from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton, QSplashScreen
 
-from gui.media_players import PhotoPlayer, VideoPlayer
 from gui.dashboard import FrameDashboard
+from gui.media_players import PhotoPlayer, VideoPlayer
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ class Popup(QDialog):
 
         # centred logo
         logo_label = QLabel(self)
-        logo = QImage("logo_small.png")  # .scaledToWidth(100, QtCore.Qt.SmoothTransformation)
+        logo = self.frame.logo_large.scaledToWidth(self.frame.frame_size.width() / 15, QtCore.Qt.SmoothTransformation)
         logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
         layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
 
@@ -137,6 +137,10 @@ class Popup(QDialog):
 class PhotoFrame(QtWidgets.QMainWindow):
     def __init__(self, config):
         super(PhotoFrame, self).__init__()
+        self.config = config
+
+        # load logo already for splashscreen
+        self.logo_large = QImage("logo.png")
 
         # instance variables to be read from config file
         self.slideshow_delay = None
@@ -148,9 +152,23 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         self.players = None
         self.current_player_index = 0
+        self.watermark = None
+        self.frame_size = 0
+        self.splash_window = None
+
+    def start(self):
+        # start timer
+        timer = QtCore.QTimer(self)
+        timer.timeout.connect(self._timer_callback)
+        timer.start(self.slideshow_delay)
+
+        # go...
+        self.showFullScreen()
+        self.raise_()
+
+    def setup(self):
 
         # read values from the config file
-        self.config = config
         self._setup_general_config()
 
         # setup an accelerometer if frame rotation enabled
@@ -164,9 +182,8 @@ class PhotoFrame(QtWidgets.QMainWindow):
         else:
             self.compass = None
 
-        # load logo
-        self.logo_large = QImage("logo.png")
-        self.logo_small = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
+        # create a watermark based on the logo
+        self.watermark = self.logo_large.scaledToWidth(50, QtCore.Qt.SmoothTransformation)
 
         # screen dimensions
         self.frame_size = QGuiApplication.primaryScreen().geometry().size()
@@ -176,15 +193,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self._setup_players()
         self._build_ui()
         self.popup = None
-
-        # start timer
-        timer = QtCore.QTimer(self)
-        timer.timeout.connect(self._timer_callback)
-        timer.start(self.slideshow_delay)
-
-        # go...
-        self.showFullScreen()
-        #self.get_current_player().splash_screen()
 
     def _setup_general_config(self):
         """
@@ -393,3 +401,25 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
         self.popup.show_image_details(filename, exif)
+
+    def splash_screen(self, delay):
+        angle_to_rotate_photo = 0
+
+        # detect if frame is rotated
+        # if self.compass:
+        #     logger.debug("Frame rotated by %d", self.compass.get_rotation_simple())
+        #     angle_to_rotate_photo = -self.compass.get_rotation_simple()
+
+        logger.debug("Rotating photo by %f", angle_to_rotate_photo)
+        splash_logo = QtGui.QPixmap.fromImage(
+            self.logo_large.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))).scaled(
+            500, 500,
+            QtCore.Qt.KeepAspectRatio,
+            QtCore.Qt.SmoothTransformation)
+
+        self.splash_window = QSplashScreen(self, splash_logo, Qt.WindowStaysOnTopHint)
+        self.splash_window.show()
+
+        # set timer to close the splashscreen
+        timer = QtCore.QTimer(self)
+        timer.singleShot(delay, self.splash_window.close)

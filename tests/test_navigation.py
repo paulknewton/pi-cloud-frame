@@ -7,6 +7,8 @@ def test_next():
     Test that 'next' navigation in non-shuffle mode moves from one photo to the next.
     """
     frame = PhotoFrame(Config("tests/test_navigation.yml"))
+    frame.setup()
+    frame.start()
     player = frame.get_current_player()
     num_photos = len(player.get_playlist())
 
@@ -23,6 +25,8 @@ def skip_test_next_shuffle():
     May need to run the test again.
     """
     frame = PhotoFrame(Config("tests/test_navigation_shuffle.yml"))
+    frame.setup()
+    frame.start()
     player = frame.get_current_player()
     num_photos = len(player.get_playlist())
 
@@ -36,15 +40,19 @@ def test_prev():
     """
     Test that 'prev' navigation in non-shuffle mode moves from one photo to the next.
     """
-    _prev_test_with_config(PhotoFrame(Config("tests/test_navigation.yml")))
+    _prev_test_with_config("tests/test_navigation.yml")
 
 def test_prev_shuffle():
     """
     Test that 'prev' navigation in non-shuffle mode moves backwards through the browsing history.
     """
-    _prev_test_with_config(PhotoFrame(Config("tests/test_navigation_shuffle.yml")))
+    _prev_test_with_config("tests/test_navigation_shuffle.yml")
 
-def _prev_test_with_config(frame):
+def _prev_test_with_config(config_filename):
+    frame = PhotoFrame(Config(config_filename))
+    frame.setup()
+    frame.start()
+
     player = frame.get_current_player()
     num_photos = len(player.get_playlist())
 
@@ -63,6 +71,9 @@ def _prev_test_with_config(frame):
 
 def test_prev_no_history():
     frame = PhotoFrame(Config("tests/test_navigation.yml"))
+    frame.setup()
+    frame.start()
+    
     player = frame.get_current_player()
 
     # generate a short browsing history

@@ -143,15 +143,15 @@ class AbstractMediaPlayer(PhotoFrameContent):
 
         return self._move(before_start, jump_to_end, move_to_prev)
 
-    def paint_logo(self, pmap):
+    def paint_watermark(self, pmap):
         """
         Overlay the logo on a pixmap
         :param pmap: the photo
         """
         painter = QPainter()
         painter.begin(pmap)
-        painter.drawImage(pmap.width() - self.photo_frame.logo_small.width() - 40,
-                          pmap.height() - self.photo_frame.logo_small.height() - 10, self.photo_frame.logo_small)
+        painter.drawImage(pmap.width() - self.photo_frame.watermark.width() - 40,
+                          pmap.height() - self.photo_frame.watermark.height() - 10, self.photo_frame.watermark)
         painter.end()
 
     def _move(self, is_boundary, jump, move):
@@ -268,7 +268,7 @@ class PhotoPlayer(AbstractMediaPlayer):
 
             # add the watermark (unrotate, watermark, rotate)
             pmap = pmap.transformed(QtGui.QTransform().rotate(-angle_to_rotate_photo))
-            self.paint_logo(pmap)
+            self.paint_watermark(pmap)
             pmap = pmap.transformed(QtGui.QTransform().rotate(angle_to_rotate_photo))
 
             self.main_window.setPixmap(pmap)

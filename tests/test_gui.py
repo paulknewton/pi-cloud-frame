@@ -2,13 +2,16 @@ import pytest
 from PyQt5 import QtCore
 
 import gui.media_players
-from utils.config import Config
 from gui.photo_app import PhotoFrame
+from utils.config import Config
 
 
 @pytest.fixture
 def window():
-    return PhotoFrame(Config("tests/test_config.yml"))
+    frame = PhotoFrame(Config("tests/test_config.yml"))
+    frame.setup()
+    frame.start()
+    return frame
 
 
 def test_change_players(qtbot, window):
@@ -98,4 +101,6 @@ def test_player_empty_playlist(qtbot):
     :return:
     """
     window = PhotoFrame(Config("tests/test_empty.yml"))
+    window.setup()
+    window.start()
     assert window.get_current_player().get_playlist() == []

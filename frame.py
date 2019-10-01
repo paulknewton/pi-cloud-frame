@@ -2,6 +2,7 @@
 
 import logging.config
 import sys
+import time
 
 import yaml
 from PyQt5 import QtWidgets
@@ -29,8 +30,16 @@ def main():
     config = Config(FRAME_CONFIG)
 
     try:
-        window = PhotoFrame(config)
-        window.raise_()
+        frame = PhotoFrame(config)
+        frame.splash_screen(5000)
+
+        app.processEvents()
+
+        frame.setup()
+        frame.start()
+
+
+
     except KeyError as exception:
         print("Error setting up frame: ", exception)
         sys.exit(1)

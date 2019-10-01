@@ -50,7 +50,7 @@ def skip_test_player_slideshow(qtbot, window):
             QtCore.Qt.KeepAspectRatio,
             QtCore.Qt.SmoothTransformation)
 
-        player.paint_logo(expected_pmap)
+        player.paint_watermark(expected_pmap)
 
         assert current_pmap.size() == expected_pmap.size()
         assert ImageChops.difference(pmap_to_pil_img(current_pmap), pmap_to_pil_img(expected_pmap)).getbbox() is None
