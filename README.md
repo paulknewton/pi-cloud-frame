@@ -222,6 +222,13 @@ One last step: if you want to launch the viewer via the touchscreen, there is a 
 * Popup Menu (Centre Tap or Enter/Return Keys)
 	If the user taps the centre area, a popup window appears showing the filename, date and location information (if available). It also allows the user to delete a photo from the device (if, like me, you have some photos that you just do not recognise and wonder how they made it into your collection!). The Enter/Return keys on a keyboard also work.
 
+## Monitoring the frame
+The software ships with a Dashboard widget that displays key information about the frame: CPU load, disk space, information on each player etc.
+Just add this to the frame configuration (included in the example above) and switch to the dashboard at any time with the up/down buttons.
+The dashboard will be updated on a periodic basis based on the slideshow delay.
+
+![dashboard](img/dashboard.png)
+
 ## Making the frame
 
 If you want to make a pi cloud frame like the one in the picture above, this is how I went about it.

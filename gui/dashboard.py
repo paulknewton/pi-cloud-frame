@@ -54,7 +54,7 @@ class FrameDashboard(PhotoFrameContent):
         machine_layout = QtWidgets.QVBoxLayout(machine_group)
         machine_group.setLayout(machine_layout)
         machine_group.setSizePolicy(no_vstretch_policy)
-        machine_group.setFixedWidth(self.photo_frame.frame_size.width() * 0.3)
+        machine_group.setFixedWidth(self.photo_frame.frame_size.width() * 0.2)
 
         self.machine_text = QtWidgets.QLabel(machine_group)
         font = machine_group.font()
