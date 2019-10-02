@@ -56,7 +56,7 @@ class Mpu6050Compass(orientation.Compass):
     def read_word_2c(adr):
         val = Mpu6050Compass.read_word(adr)
 
-        if (val >= 0x8000):
+        if val >= 0x8000:
             return -((65535 - val) + 1)
         else:
             return val
