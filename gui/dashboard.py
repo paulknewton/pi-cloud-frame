@@ -55,7 +55,7 @@ class FrameDashboard(PhotoFrameContent):
 
         self.machine_summary_widget = QtWidgets.QLabel(machine_summary_widget)
         font = machine_summary_widget.font()
-        font.setPointSize(11)
+        font.setPointSize(font.pointSize() - 2)
         machine_summary_widget.setFont(font)
         self.machine_summary_widget.setAlignment(QtCore.Qt.AlignLeft)
         machine_summary_widget_layout.addWidget(self.machine_summary_widget)
@@ -71,7 +71,7 @@ class FrameDashboard(PhotoFrameContent):
 
         self.frame_summary_widget = QtWidgets.QLabel(frame_summary_widget)
         font = frame_summary_widget.font()
-        font.setPointSize(11)
+        font.setPointSize(font.pointSize() - 2)
         frame_summary_widget.setFont(font)
         self.frame_summary_widget.setAlignment(QtCore.Qt.AlignLeft)
         frame_summary_widget_layout.addWidget(self.frame_summary_widget)
@@ -85,7 +85,7 @@ class FrameDashboard(PhotoFrameContent):
 
         self.player_list_widget = QtWidgets.QLabel(player_frame)
         font = self.player_list_widget.font()
-        font.setPointSize(11)
+        font.setPointSize(font.pointSize() - 2)
         self.player_list_widget.setFont(font)
         self.player_list_widget.setAlignment(QtCore.Qt.AlignLeft)
         player_frame_layout.addWidget(self.player_list_widget)
