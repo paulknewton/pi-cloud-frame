@@ -100,7 +100,7 @@ class FrameDashboard(PhotoFrameContent):
 
         if hasattr(psutil, "sensors_temperatures"):
             temp = psutil.sensors_temperatures()
-            summary_entries.append(["<b>CPU temp</b> %s" % temp])
+            summary_entries.append("<b>CPU temp</b> %s" % temp)
 
         summary_text = "<br>".join(summary_entries)
         logger.info(summary_text)
@@ -112,9 +112,11 @@ class FrameDashboard(PhotoFrameContent):
             "<b>Number of players:</b> %d" % len(self.photo_frame.players),
             "<b>Slideshow delay:</b> %d" % self.photo_frame.slideshow_delay,
             "<b>Root folder:</b> %s" % self.photo_frame.root_folder,
-            "<b>Compass:</b> %s" % self.photo_frame.compass.get_description(),
             "<b>Flip rotation:</b> %s" % self.photo_frame.flip_rotation
         ]
+
+        if self.photo_frame.compass:
+            summary_entries.append("<b>Compass:</b> %s" % self.photo_frame.compass.get_description())
         summary_text = "<br>".join(summary_entries)
         logger.debug(summary_text)
 
