@@ -93,7 +93,7 @@ class FrameDashboard(PhotoFrameContent):
             "<b>CPU load:</b> %s%%" % psutil.cpu_percent(),
             "<b>Total memory:</b> %s" % size(memory.total),
             "<b>Available memory:</b> %s" % size(memory.available),
-            "<b>Total disk space:</b> %s" % size(disk.total),
+            # "<b>Total disk space:</b> %s" % size(disk.total),
             "<b>Used disk space:</b> %s" % size(disk.used),
             "<b>Free disk space:</b> %s" % size(disk.free)
         ]
@@ -125,10 +125,9 @@ class FrameDashboard(PhotoFrameContent):
         self.frame_summary_widget.setText(summary_text)
 
     def _update_player_list(self):
-        player_list_entries = ["<b>Player list:</b>"] + [self._get_player_entry(player) for player in
-                                                         self.photo_frame.players]
+        player_list_entries = ["<b>Player list:</b>", "".join([self._get_player_entry(player) for player in self.photo_frame.players])]
         player_list_text = "<br>".join(player_list_entries)
-        logger.debug(player_list_text)
+        logger.info(player_list_text)
         self.player_list_widget.setText(player_list_text)
 
     def _get_player_entry(self, player: PhotoFrameContent):

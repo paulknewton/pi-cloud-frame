@@ -303,7 +303,14 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # setup UI - use a QStackedWidget to avoid widgets being destroyed
         self.stack = QtWidgets.QStackedWidget(self)
         for p in self.players:
-            player_widget = p.get_main_widget()
+            player_widget: QtWidgets.QWidget = p.get_main_widget()
+
+            # prevent oversize widgets
+            # logger.info("main_widget size before = %s", player_widget.size())
+            # policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+            # player_widget.setSizePolicy(policy)
+            # player_widget.resize(self.frame_size)
+            # logger.info("main_widget size after = %s", player_widget.size())
 
             # If the media player returns a widget, add it. Else create a dummy 'not implemented' widget
             if player_widget:
