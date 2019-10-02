@@ -194,7 +194,7 @@ class VideoPlayer(AbstractMediaPlayer):
     def get_properties(self) -> List[str]:
         return ["not implemented"]
 
-    def get_description(self) -> str:
+    def get_description(self):
         return "a video player"
 
 
