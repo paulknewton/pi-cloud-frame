@@ -103,7 +103,7 @@ class FrameDashboard(PhotoFrameContent):
             summary_entries.append("<b>CPU temp</b> %s" % temp)
 
         summary_text = "<br>".join(summary_entries)
-        logger.info(summary_text)
+        logger.debug(summary_text)
 
         self.machine_summary_widget.setText(summary_text)
 

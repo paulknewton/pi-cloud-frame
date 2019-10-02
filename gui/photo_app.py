@@ -164,7 +164,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # go...
         self.showFullScreen()
-        self.raise_()
+        self._timer_callback()
 
     def setup(self):
 
