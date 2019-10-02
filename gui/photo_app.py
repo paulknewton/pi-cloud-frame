@@ -149,12 +149,15 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.compass = None
         self.flip_rotation = None
         self.rotation = None
+        self.shuffle = None
 
         self.players = None
         self.current_player_index = 0
         self.watermark = None
         self.frame_size = 0
         self.splash_window = None
+        self.popup = None
+        self.stack = None
 
     def start(self):
         # start timer
@@ -192,7 +195,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # create frame content
         self._setup_players()
         self._build_ui()
-        self.popup = None
 
     def _setup_general_config(self):
         """
