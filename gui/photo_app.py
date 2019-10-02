@@ -238,7 +238,6 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # iterate through each entry, creating a corresponding media player
         for name in players_config:
             if players_config[name]["type"] == "photo_player":
-                from gui.media_players import PhotoPlayer
                 player = PhotoPlayer(name, self.root_folder + "/" + self.config.get_config_value("folder",
                                                                                                  players_config[name]),
                                      self,

@@ -2,7 +2,6 @@
 
 import logging.config
 import sys
-import time
 
 import yaml
 from PyQt5 import QtWidgets
