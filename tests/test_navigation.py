@@ -60,7 +60,7 @@ def _prev_test_with_config(config_filename):
 
     browsing_history = []
     # generate a browsing history
-    for i in range(num_photos * 2):
+    for _ in range(num_photos * 2):
         player.next()
         browsing_history.append(player.current_media_index)
 
