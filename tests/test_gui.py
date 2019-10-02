@@ -68,7 +68,7 @@ def test_show_popup(qtbot, window):
     assert window.popup.isVisible()
 
 
-def test_player_folder(qtbot, window):
+def test_player_folder(window):
     """
     Test method to retrieve playlist folder
     :param qtbot: fixture to trigger window events
@@ -77,7 +77,7 @@ def test_player_folder(qtbot, window):
     assert window.get_current_player().get_folder() == "tests/test_media/photos"
 
 
-def test_player_playlist(qtbot, window):
+def test_player_playlist(window):
     """
     Test loading of playlist from media folder
     :param qtbot: fixture to trigger window events
@@ -93,7 +93,7 @@ def test_player_playlist(qtbot, window):
     assert sorted(expected_photos) == sorted(current_playlist)
 
 
-def test_player_empty_playlist(qtbot):
+def test_player_empty_playlist():
     """
     Test media player with no photos
     :param qtbot:
