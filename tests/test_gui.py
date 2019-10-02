@@ -20,7 +20,7 @@ def test_change_players(qtbot, window):
     :param qtbot: fixture to trigger window events
     :param window: PhotoFrame widget
     """
-    assert type(window.get_current_player()) == gui.media_players.PhotoPlayer
+    assert type(window.get_current_player()) is gui.media_players.PhotoPlayer
     player1 = window.get_current_player().get_name()
 
     # down
