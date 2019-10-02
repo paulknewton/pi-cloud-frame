@@ -30,6 +30,7 @@ class FrameDashboard(PhotoFrameContent):
         self._update()
 
     def _build_ui(self):
+        # align each section in a centred, vertical column
         main_layout = QtWidgets.QVBoxLayout(self.main_window)
         main_layout.setAlignment(QtCore.Qt.AlignHCenter)
         self.main_window.setLayout(main_layout)
@@ -38,14 +39,16 @@ class FrameDashboard(PhotoFrameContent):
         no_vstretch_policy.setVerticalStretch(0)
         # no_vstretch_policy.setHorizontalPolicy(QSizePolicy.Fixed)
 
+        # title
         heading = QtWidgets.QLabel(self.main_window)
 
         heading.setAlignment(QtCore.Qt.AlignCenter)
-        heading.setText("<p><b>Dashboard</b><p><hr>")
+        heading.setText("<p><b>Dashboard</b>")
         heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
         heading.setSizePolicy(no_vstretch_policy)
         main_layout.addWidget(heading)
 
+        # machine info
         machine_summary_widget = QtWidgets.QFrame()
         machine_summary_widget.setFrameStyle(QtWidgets.QFrame.Panel)
         machine_summary_widget_layout = QtWidgets.QVBoxLayout(machine_summary_widget)
@@ -62,6 +65,7 @@ class FrameDashboard(PhotoFrameContent):
 
         main_layout.addWidget(machine_summary_widget)
 
+        # frame info
         frame_summary_widget = QtWidgets.QFrame()
         frame_summary_widget.setFrameStyle(QtWidgets.QFrame.Panel)
         frame_summary_widget_layout = QtWidgets.QVBoxLayout(frame_summary_widget)
@@ -78,6 +82,7 @@ class FrameDashboard(PhotoFrameContent):
 
         main_layout.addWidget(frame_summary_widget)
 
+        # list of players
         player_frame = QtWidgets.QFrame()
         player_frame.setFrameStyle(QtWidgets.QFrame.Panel)
         player_frame_layout = QtWidgets.QVBoxLayout(player_frame)
@@ -135,7 +140,7 @@ class FrameDashboard(PhotoFrameContent):
         self.frame_summary_widget.setText(summary_text)
 
     def _update_player_list(self):
-        player_list_entries = ["<b>Player list:</b>", "".join([self._get_player_entry(player) for player in self.photo_frame.players])]
+        player_list_entries = [self._get_player_entry(player) for player in self.photo_frame.players]
         player_list_text = "<br>".join(player_list_entries)
         logger.debug(player_list_text)
         self.player_list_widget.setText(player_list_text)
