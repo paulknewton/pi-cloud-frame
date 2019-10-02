@@ -40,12 +40,12 @@ class FrameDashboard(PhotoFrameContent):
         # no_vstretch_policy.setHorizontalPolicy(QSizePolicy.Fixed)
 
         # title
-        heading = QtWidgets.QLabel()
-
-        heading.setAlignment(QtCore.Qt.AlignCenter)
-        heading.setText("<p><b>Dashboard</b>")
-        heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.3)
-        heading.setSizePolicy(no_vstretch_policy)
+        # heading = QtWidgets.QLabel()
+        #
+        # heading.setAlignment(QtCore.Qt.AlignCenter)
+        # heading.setText("<p><b>Dashboard</b>")
+        # heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.3)
+        # heading.setSizePolicy(no_vstretch_policy)
         #main_layout.addWidget(heading, 0, 0, 0, 1)
 
         # machine info
