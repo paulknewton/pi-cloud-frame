@@ -39,6 +39,7 @@ class FrameDashboard(PhotoFrameContent):
         # no_vstretch_policy.setHorizontalPolicy(QSizePolicy.Fixed)
 
         heading = QtWidgets.QLabel(self.main_window)
+
         heading.setAlignment(QtCore.Qt.AlignCenter)
         heading.setText("<p><b>Dashboard</b><p><hr>")
         heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
@@ -53,6 +54,9 @@ class FrameDashboard(PhotoFrameContent):
         machine_summary_widget.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
 
         self.machine_summary_widget = QtWidgets.QLabel(machine_summary_widget)
+        font = machine_summary_widget.font()
+        font.setPointSize(11)
+        machine_summary_widget.setFont(font)
         self.machine_summary_widget.setAlignment(QtCore.Qt.AlignLeft)
         machine_summary_widget_layout.addWidget(self.machine_summary_widget)
 
@@ -66,6 +70,9 @@ class FrameDashboard(PhotoFrameContent):
         frame_summary_widget.setFixedWidth(self.photo_frame.frame_size.width() * 0.7)
 
         self.frame_summary_widget = QtWidgets.QLabel(frame_summary_widget)
+        font = frame_summary_widget.font()
+        font.setPointSize(11)
+        frame_summary_widget.setFont(font)
         self.frame_summary_widget.setAlignment(QtCore.Qt.AlignLeft)
         frame_summary_widget_layout.addWidget(self.frame_summary_widget)
 
@@ -77,6 +84,9 @@ class FrameDashboard(PhotoFrameContent):
         player_frame.setLayout(player_frame_layout)
 
         self.player_list_widget = QtWidgets.QLabel(player_frame)
+        font = self.player_list_widget.font()
+        font.setPointSize(11)
+        self.player_list_widget.setFont(font)
         self.player_list_widget.setAlignment(QtCore.Qt.AlignLeft)
         player_frame_layout.addWidget(self.player_list_widget)
 
