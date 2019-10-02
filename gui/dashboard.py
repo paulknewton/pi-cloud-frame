@@ -131,8 +131,11 @@ class FrameDashboard(PhotoFrameContent):
         self.player_list_widget.setText(player_list_text)
 
     def _get_player_entry(self, player: PhotoFrameContent):
-        properties = ["<li>%s</li>" % p for p in player.get_properties()]
-        return "<b>%s</b> - %s<ul>" % (player.get_name(), player.get_description()) + "".join(properties) + "</ul>"
+        properties = player.get_properties()
+        properties_text = ""
+        if properties:
+            properties_text = ["<li>%s</li>" % p for p in properties]
+        return "<b>%s</b> - %s<ul>" % (player.get_name(), player.get_description()) + "".join(properties_text) + "</ul>"
 
     def _update(self):
         logger.debug("Updating dashboard")
@@ -147,7 +150,7 @@ class FrameDashboard(PhotoFrameContent):
         self._update()
 
     def get_properties(self) -> List[str]:
-        return ["-"]
+        return None
 
     def get_description(self) -> str:
         return "a system dashboard to show the current state of the photo frame"
