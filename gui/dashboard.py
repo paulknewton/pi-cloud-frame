@@ -127,7 +127,7 @@ class FrameDashboard(PhotoFrameContent):
     def _update_player_list(self):
         player_list_entries = ["<b>Player list:</b>", "".join([self._get_player_entry(player) for player in self.photo_frame.players])]
         player_list_text = "<br>".join(player_list_entries)
-        logger.info(player_list_text)
+        logger.debug(player_list_text)
         self.player_list_widget.setText(player_list_text)
 
     def _get_player_entry(self, player: PhotoFrameContent):
