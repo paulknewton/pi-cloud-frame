@@ -41,12 +41,12 @@ class Config:
         return value
 
 
-@staticmethod
-def _get_config_value(key, config_dict, default):
-    try:
-        value = config_dict[key]
-    except KeyError:
-        logger.debug("Using default for config value %s = %s", key, default)
-        return default
+    @staticmethod
+    def _get_config_value(key, config_dict, default):
+        try:
+            value = config_dict[key]
+        except KeyError:
+            logger.debug("Using default for config value %s = %s", key, default)
+            return default
 
-    return value
+        return value
