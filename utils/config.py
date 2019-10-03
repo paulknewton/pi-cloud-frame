@@ -1,4 +1,5 @@
 import logging
+from typing import Dict
 
 import yaml
 
@@ -18,7 +19,7 @@ class Config:
         "players": None  # section containing configuration of media players
     }
 
-    def __init__(self, filename):
+    def __init__(self, filename: str):
         self.root = None
 
         try:
@@ -31,7 +32,7 @@ class Config:
         # print(data)
 
     @staticmethod
-    def get_config_value(key, config_dict):
+    def get_config_value(key: str, config_dict: Dict):
         # get a default value (if any)
         default_value = Config.default.get(key, None)
 
@@ -42,7 +43,7 @@ class Config:
 
 
     @staticmethod
-    def _get_config_value(key, config_dict, default):
+    def _get_config_value(key: str, config_dict: Dict, default):
         try:
             value = config_dict[key]
         except KeyError:

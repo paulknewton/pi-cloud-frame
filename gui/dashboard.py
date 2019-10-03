@@ -1,12 +1,13 @@
-from hurry.filesize import size
-import psutil
 import logging
 from typing import List
 
+import psutil
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QSizePolicy
+from hurry.filesize import size
 
 import utils.orientation
+from gui.photo_app import PhotoFrame
 from gui.players import PhotoFrameContent
 
 logger = logging.getLogger(__name__)
@@ -14,9 +15,8 @@ logger = logging.getLogger(__name__)
 
 class FrameDashboard(PhotoFrameContent):
 
-    def __init__(self, name: str, compass: utils.orientation.Compass, photo_frame):
-        super().__init__(name, compass)
-        self.photo_frame = photo_frame
+    def __init__(self, name: str, photo_frame: PhotoFrame):
+        super().__init__(name, photo_frame)
 
         self.main_window = QtWidgets.QWidget(self.photo_frame)
         # self.main_window.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))

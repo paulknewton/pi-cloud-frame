@@ -2,6 +2,7 @@ import collections
 import logging
 import os
 import sys
+from typing import List
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
@@ -10,128 +11,10 @@ from PyQt5.QtGui import QFont, QImage
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton, QSplashScreen
 
-from gui.dashboard import FrameDashboard
-from gui.media_players import PhotoPlayer, VideoPlayer
+from gui.players import PhotoFrameContent
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
-
-
-class Popup(QDialog):
-    def __init__(self, frame, font_size):
-        super().__init__()
-        self.frame = frame  # to access methods on the photo frame
-
-        self.font_size = font_size
-        self.setWindowModality(Qt.NonModal)
-        self.setWindowFlag(Qt.FramelessWindowHint)
-
-        self.labels = ["Filename:", "Date:", "Location:"]  # static labels
-        # list of QLabel widgets, each corresponding to a static label
-        self.value_widgets = None
-        self._build_ui()
-
-        # ref to current filename (used to delete files)
-        self._current_filename = None
-
-    def show_image_details(self, filename, exif_tags):
-        """
-        Display meta information about the selected photo in the popup dialog.
-
-        :param filename: filename of the photo
-        :param exif_tags: dictionary of EXIF tags for the photo
-        """
-        logger.debug("Filename: %s", self._current_filename)
-        self._current_filename = filename
-        if not filename:
-            filename = "<unknown>"
-        self.value_widgets[0].setText(filename)
-
-        # extract EXIF data (set default values in case the information cannot be found)
-        logger.debug("exif tags: %s", exif_tags)
-        date = location = "<unknown>"
-
-        if isinstance(exif_tags, collections.Mapping):
-            long_ref = long = lat_ref = lat = ""
-            if "EXIF DateTimeOriginal" in exif_tags.keys():
-                date = str(exif_tags["EXIF DateTimeOriginal"])
-
-            if "GPS GPSLatitudeRef" in exif_tags.keys():
-                lat_ref = exif_tags["GPS GPSLatitudeRef"]
-
-            if "GPS GPSLatitude" in exif_tags.keys():
-                lat = exif_tags["GPS GPSLatitude"]
-
-            if "GPS GPSLongitudeRef" in exif_tags.keys():
-                long_ref = exif_tags["GPS GPSLongitudeRef"]
-
-            if "GPS GPSLongitude" in exif_tags.keys():
-                long = exif_tags["GPS GPSLongitude"]
-
-            # if we have GPS data, reverse lookup address
-            if all([lat, lat_ref, long, long_ref]):
-                lat_d, lat_m, lat_s = tuple(lat.values)
-                long_d, long_m, long_s = tuple(long.values)
-                location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
-                                                        lat_s.num / lat_s.den,
-                                                        lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
-                                                        long_s.num / long_s.den, long_ref)
-
-                # reformat lines
-                location = "\n".join(location.split(", "))
-
-        self.value_widgets[1].setText(date)
-        self.value_widgets[2].setText(location)
-        # self.date_label.adjustSize()
-        self.show()
-
-    def _build_ui(self):
-        layout = QGridLayout(self)
-        self.value_widgets = []
-
-        # font used in popup dialog
-        font_roman = QFont()
-        font_roman.setPointSize(self.font_size)
-        font_bold = QFont()
-        font_bold.setPointSize(self.font_size)
-        font_bold.setBold(True)
-
-        # centred logo
-        logo_label = QLabel(self)
-        logo = self.frame.logo_large.scaledToWidth(self.frame.frame_size.width() / 15, QtCore.Qt.SmoothTransformation)
-        logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
-        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
-
-        # create labels and empty values
-        for y, label in enumerate(self.labels):
-            label_widget = QLabel(label, self)
-            label_widget.setAlignment(QtCore.Qt.AlignRight)
-            label_widget.setFont(font_bold)
-            layout.addWidget(label_widget, y + 1, 0)
-
-            value_widget = QLabel(self)
-            value_widget.setFont(font_roman)
-            layout.addWidget(value_widget, y + 1, 1)
-            self.value_widgets.append(value_widget)
-
-        delete_button = QPushButton("Delete photo", self)
-        delete_button.clicked.connect(self.on_click)
-
-        layout.addWidget(delete_button, len(self.labels) + 1, 0, 1, -1)  # span 2 columns
-
-    @pyqtSlot()
-    def on_click(self):
-        """
-        Callback for delete button. Remove the selected photo from the disk and close the popup.
-        """
-        if not self._current_filename:
-            logger.error("Filename not defined. Cannot remove it.")
-            return
-
-        logger.info("Deleting %s", self._current_filename)
-        os.remove(self._current_filename)
-        self.close()
-        self.frame.get_current_player().next()
 
 
 class PhotoFrame(QtWidgets.QMainWindow):
@@ -240,15 +123,18 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # iterate through each entry, creating a corresponding media player
         for name in players_config:
             if players_config[name]["type"] == "photo_player":
+                from gui.media_players import PhotoPlayer
                 player = PhotoPlayer(name, self.root_folder + "/" + self.config.get_config_value("folder",
                                                                                                  players_config[name]),
                                      self,
                                      self.config.get_config_value("shuffle", players_config[name]))
 
             elif players_config[name]["type"] == "dashboard":
-                player = FrameDashboard(name, self.compass, self)
+                from gui.dashboard import FrameDashboard
+                player = FrameDashboard(name, self)
 
             elif players_config[name]["type"] == "video_player":
+                from gui.media_players import VideoPlayer
                 # TODO - replace instance call with static method call
                 player = VideoPlayer(name,
                                      self.root_folder + "/" + self.config.get_config_value("folder",
@@ -260,7 +146,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             self.players.append(player)
             self.current_player_index = 0
 
-    def next_player(self):
+    def next_player(self) -> PhotoFrameContent:
         """
         Switch to the next media player. If at the end of the player list, jump to the start
         """
@@ -275,7 +161,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self._set_player_by_index(new_index)
         return self.get_current_player()
 
-    def prev_player(self):
+    def prev_player(self) -> PhotoFrameContent:
         """
         Switch to the previous media player. If at the end of the player list, jump to the start
         """
@@ -290,7 +176,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self._set_player_by_index(new_index)
         return self.get_current_player()
 
-    def get_current_player(self):
+    def get_current_player(self) -> PhotoFrameContent:
         """
         Get a reference to the current media player
 
@@ -324,7 +210,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
                 self.stack.addWidget(not_implemented)
         self.setCentralWidget(self.stack)
 
-    def _set_player_by_index(self, index):
+    def _set_player_by_index(self, index: int):
         new_player = self.players[index]
         logger.debug("Changing to player index %d (%s)", index, new_player.get_name())
         self.current_player_index = index
@@ -400,6 +286,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
     def _popup(self):
         # only show popup for photo player
+        from gui.media_players import PhotoPlayer
         if not isinstance(self.get_current_player(), PhotoPlayer):
             return
 
@@ -410,7 +297,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
         self.popup.show_image_details(filename, exif)
 
-    def splash_screen(self, delay):
+    def splash_screen(self, delay: int):
         angle_to_rotate_photo = 0
 
         # detect if frame is rotated
@@ -429,5 +316,122 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.splash_window.show()
 
         # set timer to close the splashscreen
-        timer = QtCore.QTimer(self)
-        timer.singleShot(delay, self.splash_window.close)
+        def wrap_close():
+            self.splash_window.close()
+        QtCore.QTimer.singleShot(delay, wrap_close)
+
+
+class Popup(QDialog):
+    def __init__(self, frame: PhotoFrame, font_size: int):
+        super().__init__()
+        self.frame = frame  # to access methods on the photo frame
+
+        self.font_size = font_size
+        self.setWindowModality(Qt.NonModal)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+
+        self.labels = ["Filename:", "Date:", "Location:"]  # static labels
+        # list of QLabel widgets, each corresponding to a static label
+        self.value_widgets: List[QtWidgets.QWidget] = []
+        self._build_ui()
+
+        # ref to current filename (used to delete files)
+        self._current_filename: str = ""
+
+    def show_image_details(self, filename, exif_tags):
+        """
+        Display meta information about the selected photo in the popup dialog.
+
+        :param filename: filename of the photo
+        :param exif_tags: dictionary of EXIF tags for the photo
+        """
+        logger.debug("Filename: %s", self._current_filename)
+        self._current_filename = filename
+        if not filename:
+            filename = "<unknown>"
+        self.value_widgets[0].setText(filename)
+
+        # extract EXIF data (set default values in case the information cannot be found)
+        logger.debug("exif tags: %s", exif_tags)
+        date = location = "<unknown>"
+
+        if isinstance(exif_tags, collections.Mapping):
+            long_ref = lat_ref = lat = long = ""
+            if "EXIF DateTimeOriginal" in exif_tags.keys():
+                date = str(exif_tags["EXIF DateTimeOriginal"])
+
+            if "GPS GPSLatitudeRef" in exif_tags.keys():
+                lat_ref = exif_tags["GPS GPSLatitudeRef"]
+
+            if "GPS GPSLatitude" in exif_tags.keys():
+                lat = exif_tags["GPS GPSLatitude"]
+
+            if "GPS GPSLongitudeRef" in exif_tags.keys():
+                long_ref = exif_tags["GPS GPSLongitudeRef"]
+
+            if "GPS GPSLongitude" in exif_tags.keys():
+                long = exif_tags["GPS GPSLongitude"]
+
+            # if we have GPS data, reverse lookup address
+            if all([lat, lat_ref, long, long_ref]):
+                lat_d, lat_m, lat_s = tuple(lat.values)
+                long_d, long_m, long_s = tuple(long.values)
+                location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
+                                                        lat_s.num / lat_s.den,
+                                                        lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
+                                                        long_s.num / long_s.den, long_ref)
+
+                # reformat lines
+                location = "\n".join(location.split(", "))
+
+        self.value_widgets[1].setText(date)
+        self.value_widgets[2].setText(location)
+        # self.date_label.adjustSize()
+        self.show()
+
+    def _build_ui(self):
+        layout = QGridLayout(self)
+
+        # font used in popup dialog
+        font_roman = QFont()
+        font_roman.setPointSize(self.font_size)
+        font_bold = QFont()
+        font_bold.setPointSize(self.font_size)
+        font_bold.setBold(True)
+
+        # centred logo
+        logo_label = QLabel(self)
+        logo = self.frame.logo_large.scaledToWidth(self.frame.frame_size.width() / 15, QtCore.Qt.SmoothTransformation)
+        logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
+        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
+
+        # create labels and empty values
+        for y, label in enumerate(self.labels):
+            label_widget = QLabel(label, self)
+            label_widget.setAlignment(QtCore.Qt.AlignRight)
+            label_widget.setFont(font_bold)
+            layout.addWidget(label_widget, y + 1, 0)
+
+            value_widget = QLabel(self)
+            value_widget.setFont(font_roman)
+            layout.addWidget(value_widget, y + 1, 1)
+            self.value_widgets.append(value_widget)
+
+        delete_button = QPushButton("Delete photo", self)
+        delete_button.clicked.connect(self.on_click)
+
+        layout.addWidget(delete_button, len(self.labels) + 1, 0, 1, -1)  # span 2 columns
+
+    @pyqtSlot()
+    def on_click(self):
+        """
+        Callback for delete button. Remove the selected photo from the disk and close the popup.
+        """
+        if not self._current_filename:
+            logger.error("Filename not defined. Cannot remove it.")
+            return
+
+        logger.info("Deleting %s", self._current_filename)
+        os.remove(self._current_filename)
+        self.close()
+        self.frame.get_current_player().next()
