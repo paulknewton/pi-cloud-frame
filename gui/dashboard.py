@@ -111,7 +111,7 @@ class FrameDashboard(PhotoFrameContent):
 
         summary_entries = [
             "<b>CPU load:</b> %s%%" % psutil.cpu_percent(),
-            "<b>Total memory:</b> %s" % size(memory.total),
+            # "<b>Total memory:</b> %s" % size(memory.total),
             "<b>Available memory:</b> %s" % size(memory.available),
             # "<b>Total disk space:</b> %s" % size(disk.total),
             "<b>Used disk space:</b> %s" % size(disk.used),
