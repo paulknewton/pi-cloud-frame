@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/paulknewton/pi-cloud-frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi-cloud-frame)
-[![codecov](https://codecov.io/gh/paulknewton/pi-cloud-frame/branch/master/graph/badge.svg)](https://codecov.io/gh/paulknewton/pi-cloud-frame)
+[![Build Status](https://travis-ci.org/paulknewton/pi_cloud_frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi_cloud_frame)
+[![codecov](https://codecov.io/gh/paulknewton/pi_cloud_frame/branch/master/graph/badge.svg)](https://codecov.io/gh/paulknewton/pi_cloud_frame)
 
-[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi-cloud-frame/?ref=repository-badge)
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi_cloud_frame/?ref=repository-badge)
 # pi cloud frame
 ![logo_medium](img/logo_medium.png)
 
