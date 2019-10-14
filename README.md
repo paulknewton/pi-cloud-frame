@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/paulknewton/pi_cloud_frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi_cloud_frame)
 [![codecov](https://codecov.io/gh/paulknewton/pi_cloud_frame/branch/master/graph/badge.svg)](https://codecov.io/gh/paulknewton/pi_cloud_frame)
+[![pyup](https://pyup.io/repos/github/paulknewton/pi_cloud_frame/shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi_cloud_frame)
+[![python3](https://pyup.io/repos/github/paulknewton/pi_cloud_frame/python-3-shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi_cloud_frame)
 
 [![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi_cloud_frame/?ref=repository-badge)
 # pi cloud frame
@@ -83,9 +85,10 @@ sudo apt-get install python3-pyqt
 ```
 
 
-The rest of the python dependencies are all listed in ```requirements.txt``` so installation should be a matter of:
+The rest of the python dependencies are all listed in ```requirements.txt``` (for the software) and ```requirements_dev.txt``` (for the unit tests) so installation should be a matter of:
 
 ```
+pip install -r requirements_dev.txt
 pip install -r requirements.txt
 ```
 
