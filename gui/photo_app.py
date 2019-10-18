@@ -229,6 +229,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # close the popup (if open)
         if self.popup and self.popup.isVisible():
             self.popup.hide()
+            return  # make sure we return here, otherwise the dialog re-opens further down!
 
         # get the width/height of the screen, and the mouse click lco-ords
         width, height = self.size().width(), self.size().height()
