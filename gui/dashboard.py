@@ -50,7 +50,7 @@ class FrameDashboard(PhotoFrameContent):
 
         # machine info
         machine_group = QtWidgets.QFrame()
-        machine_group.setFrameStyle(QtWidgets.QFrame.Panel)
+        machine_group.setFrameStyle(QtWidgets.QFrame.NoFrame)
         machine_layout = QtWidgets.QVBoxLayout(machine_group)
         machine_group.setLayout(machine_layout)
         machine_group.setSizePolicy(no_vstretch_policy)
@@ -67,7 +67,7 @@ class FrameDashboard(PhotoFrameContent):
 
         # frame info
         frame_group = QtWidgets.QFrame()
-        frame_group.setFrameStyle(QtWidgets.QFrame.Panel)
+        frame_group.setFrameStyle(QtWidgets.QFrame.NoFrame)
         frame_layout = QtWidgets.QVBoxLayout(frame_group)
         frame_group.setLayout(frame_layout)
         frame_group.setSizePolicy(no_vstretch_policy)
