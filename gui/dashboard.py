@@ -121,7 +121,7 @@ class FrameDashboard(PhotoFrameContent):
         if hasattr(psutil, "sensors_temperatures"):
             readings = psutil.sensors_temperatures()
             for cpu, temp in readings.items():
-                summary_entries.append("<b>%s</b> %s" % (cpu, temp))
+                summary_entries.append("<b>%s</b> %s" % (cpu.capitalize(), temp[0].current))
 
         summary_text = "<br>".join(summary_entries)
         logger.debug(summary_text)
