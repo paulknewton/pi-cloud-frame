@@ -54,13 +54,13 @@ class FrameDashboard(PhotoFrameContent):
         machine_layout = QtWidgets.QVBoxLayout(machine_group)
         machine_group.setLayout(machine_layout)
         machine_group.setSizePolicy(no_vstretch_policy)
-        machine_group.setFixedWidth(self.photo_frame.frame_size.width() * 0.2)
+        machine_group.setFixedWidth(self.photo_frame.frame_size.width() * 0.4)
 
         self.machine_text = QtWidgets.QLabel(machine_group)
         font = machine_group.font()
         font.setPointSize(font.pointSize() - 2)
         machine_group.setFont(font)
-        self.machine_text.setAlignment(QtCore.Qt.AlignLeft)
+        self.machine_text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         machine_layout.addWidget(self.machine_text)
 
         main_layout.addWidget(machine_group, 0, 0)
@@ -77,7 +77,7 @@ class FrameDashboard(PhotoFrameContent):
         font = frame_group.font()
         font.setPointSize(font.pointSize() - 2)
         frame_group.setFont(font)
-        self.frame_text.setAlignment(QtCore.Qt.AlignLeft)
+        self.frame_text.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         frame_layout.addWidget(self.frame_text)
 
         main_layout.addWidget(frame_group, 0, 1)
@@ -119,8 +119,9 @@ class FrameDashboard(PhotoFrameContent):
         ]
 
         if hasattr(psutil, "sensors_temperatures"):
-            temp = psutil.sensors_temperatures()
-            summary_entries.append("<b>CPU temp</b> %s" % temp)
+            readings = psutil.sensors_temperatures()
+            for cpu, temp in readings.items():
+                summary_entries.append("<b>%s</b> %s" % (cpu, temp))
 
         summary_text = "<br>".join(summary_entries)
         logger.debug(summary_text)
