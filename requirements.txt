@@ -8,3 +8,4 @@ geopy>=1.20.0
 hurry.filesize>=0.9
 psutil>=5.6.3
 pyicloud>=0.9.1
+tqdm==4.36.1
