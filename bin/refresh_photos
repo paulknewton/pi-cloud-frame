@@ -98,7 +98,8 @@ cd "$CROPPED"
 for SRC_FILE in "$ROOT/$DOWNLOAD"/*;
 do
     OUT_FILE=`basename "$SRC_FILE" | sed -e 's/ /_/g'`
-    echo Cropping $OUT_FILE
+#    echo Cropping $OUT_FILE
+    echo -ne "#"
     aspectcrop -a "$ASPECT" "$SRC_FILE" "$OUT_FILE"
 done
 cd "$ROOT"
@@ -115,10 +116,15 @@ echo "Converting photos in $CROPPED to $OUT..."
 cd "$OUT"
 for i in "$ROOT/$CROPPED"/*
 do
-    echo `basename "$i"`
+#    echo `basename "$i"`
+    echo -ne "#"
     convert "$i" `basename "$i"`.jpg
 done
 cd "$ROOT"
 
 echo "Cleaning crop folder $CROPPED..."
 $DELETE rm -f "$CROPPED"/*
+
+echo "Done"
+exit 0
+
