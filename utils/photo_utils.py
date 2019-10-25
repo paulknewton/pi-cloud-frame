@@ -2,6 +2,7 @@ import logging
 import random
 
 import exifread
+from geopy.exc import GeocoderServiceError
 from geopy.geocoders import Nominatim
 from geopy.point import Point
 
@@ -21,7 +22,7 @@ def get_sample(photos, n):
     return random.sample(photos, n)
 
 
-def get_gps_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref):
+def get_gps_dms_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref):
     """
     Lookup address for a set of GPD co-ordinates in DMS form
     :param lat_d: latitude (degrees)
@@ -32,15 +33,37 @@ def get_gps_location(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_
     :param long_m: longitude (minutes)
     :param long_s: longitude (seconds)
     :param long_ref: longitude reference (E/W)
-    :return:
+    :return: address as a string or "" if not found/lookup error
     """
     logger.debug("Checking gps location: %s", locals())
     geolocator = Nominatim(user_agent="pi-cloud-frame")
     location_point = Point(
         "%d %d' %f'' %s, %d %d' %f'' %s" % (lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref))
-    location = geolocator.reverse(location_point)
 
-    return location.address
+    try:
+        return geolocator.reverse(location_point).address
+    except GeocoderServiceError as e:
+        logger.error("Error downloading map from Google Maps API - %s", e)
+        return ""
+
+
+def gps_dms_to_dd(lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref):
+    """
+    Lookup address for a set of GPD co-ordinates in DMS form
+    :param lat_d: latitude (degrees)
+    :param lat_m: latitude (minutes)
+    :param lat_s: latitude (seconds)
+    :param lat_ref: latitude reference (N/S)
+    :param long_d: longitude (degrees)
+    :param long_m: longitude (minutes)
+    :param long_s: longitude (seconds)
+    :param long_ref: longitude reference (E/W)
+    :return: latitude, longitude, altitude
+    """
+    location_point = Point(
+        "%d %d' %f'' %s, %d %d' %f'' %s" % (lat_d, lat_m, lat_s, lat_ref, long_d, long_m, long_s, long_ref))
+
+    return location_point.latitude, location_point.longitude, location_point.altitude
 
 
 def get_file_exif_orientation(image_filename):

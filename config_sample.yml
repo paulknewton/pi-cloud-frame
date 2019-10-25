@@ -4,13 +4,14 @@ frame:
     font: 14
     compass: mpu6050
     flip_rotation: true
+    google_maps: 3294239jdsfwd
 
 players:
    Holiday Photo Player:
         type: photo_player
         folder: italy
 		shuffle: true
-        
+
     Family Photo Player:
         type: photo_player
         folder: personal

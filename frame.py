@@ -37,8 +37,6 @@ def main():
         frame.setup()
         frame.start()
 
-
-
     except KeyError as exception:
         print("Error setting up frame: ", exception)
         sys.exit(1)

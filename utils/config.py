@@ -16,6 +16,7 @@ class Config:
         "rotation": 0,  # if 'fixed' compass is used, what is the angle of the frame
         "flip_rotation": False,  # rotation values are inverted to handle upside down accelerometer
         "shuffle": False,  # shuffle slideshow
+        "google_maps": None,  # Google Maps API key to download map thumbnails in popup
         "players": None  # section containing configuration of media players
     }
 
@@ -40,7 +41,6 @@ class Config:
         value = config_dict.get(key, default_value)
         logger.debug("Config value %s = %s", key, value)
         return value
-
 
     @staticmethod
     def _get_config_value(key: str, config_dict: Dict, default):

@@ -1,3 +1,4 @@
+# noinspection PyPackageRequirements,PyPackageRequirements
 import mock
 import pytest
 from mock import PropertyMock
@@ -8,15 +9,15 @@ from network.icloud_photos import IcloudPhotos
 class DummyPhoto:
     @property
     def _master_record(self):
-        pass
+        return None
 
     @property
     def _asset_record(self):
-        pass
+        return None
 
     @property
     def dimensions(self):
-        pass
+        return None
 
 
 @mock.patch("tests.test_icloud.DummyPhoto._master_record", new_callable=PropertyMock)
@@ -44,8 +45,6 @@ def test_is_image_with_photos(mock_photo_record):
 def test_is_image_with_none():
     """
     Test the is_image method handles None images without failing.
-
-    :param mock_photo_record: mock photo setup by the Mock framework
     """
     assert not IcloudPhotos.is_image(None)
 
@@ -65,8 +64,6 @@ def test_is_image_with_none_photos(mock_photo_record):
 def test_format_none():
     """
     Test the format (portrait/landscape) function raises an exception with None images.
-
-    :param mock_photo_record: mock photo setup by the Mock framework
     """
     with pytest.raises(ValueError):
         assert not IcloudPhotos.is_correct_format(None, "portrait")
@@ -78,8 +75,6 @@ def test_format_none():
 def test_format_invalid_orientation():
     """
     Test the format method for a photo if the orientation is an invalid value.
-
-    :param mock_photo_record: mock photo setup by the Mock framework
     """
     photo = DummyPhoto()
     with pytest.raises(ValueError):
@@ -93,7 +88,9 @@ def test_format(mock_photo_master_record, mock_photo_asset_record, mock_photo_di
     """
     Test photo is recognised corrctly as portrait vs. landscape (including when rotated).
 
-    :param mock_photo_record: mock photo setup by the Mock framework
+    :param mock_photo_master_record: mock photo setup by the Mock framework
+    :param mock_photo_asset_record: mock photo setup by the Mock framework
+    :param mock_photo_dimensions: mock photo setup by the Mock framework
     """
     photo = DummyPhoto()
 

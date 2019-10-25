@@ -71,7 +71,6 @@ def test_show_popup(qtbot, window):
 def test_player_folder(window):
     """
     Test method to retrieve playlist folder
-    :param qtbot: fixture to trigger window events
     :param window: PhotoFrame widget
     """
     assert window.get_current_player().get_folder() == "tests/test_media/photos"
@@ -80,7 +79,6 @@ def test_player_folder(window):
 def test_player_playlist(window):
     """
     Test loading of playlist from media folder
-    :param qtbot: fixture to trigger window events
     :param window: PhotoFrame widget
     """
     media_folder = window.get_current_player().get_folder()
@@ -96,9 +94,6 @@ def test_player_playlist(window):
 def test_player_empty_playlist():
     """
     Test media player with no photos
-    :param qtbot:
-    :param window:
-    :return:
     """
     window = PhotoFrame(Config("tests/test_empty.yml"))
     window.setup()

@@ -14,9 +14,10 @@ def test_next():
 
     # assert player.current_media_index is None
 
-    for i in range(num_photos * 2): #  loop past the end
+    for i in range(num_photos * 2):  # loop past the end
         player.next()
         assert player.current_media_index == (i + 1) % num_photos
+
 
 def skip_test_next_shuffle():
     """
@@ -32,9 +33,10 @@ def skip_test_next_shuffle():
 
     assert player.current_media_index is None
 
-    for i in range(min(4, num_photos)):  #  keep the number of transitions small to reduce the probabilty of this failing
+    for i in range(min(4, num_photos)):  # keep the number of transitions small to reduce the probabilty of this failing
         player.next()
         assert player.current_media_index != i
+
 
 def test_prev():
     """
@@ -42,11 +44,13 @@ def test_prev():
     """
     _prev_test_with_config("tests/test_navigation.yml")
 
+
 def test_prev_shuffle():
     """
     Test that 'prev' navigation in non-shuffle mode moves backwards through the browsing history.
     """
     _prev_test_with_config("tests/test_navigation_shuffle.yml")
+
 
 def _prev_test_with_config(config_filename):
     frame = PhotoFrame(Config(config_filename))
@@ -69,11 +73,12 @@ def _prev_test_with_config(config_filename):
         assert player.current_media_index == j
         player.prev()
 
+
 def test_prev_no_history():
     frame = PhotoFrame(Config("tests/test_navigation.yml"))
     frame.setup()
     frame.start()
-    
+
     player = frame.get_current_player()
 
     # generate a short browsing history

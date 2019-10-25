@@ -57,8 +57,10 @@ def skip_test_player_slideshow(qtbot, window):
 
         qtbot.wait(3000)
 
+
 def test_show_portrait():
     pass
+
 
 def test_exif():
     pass

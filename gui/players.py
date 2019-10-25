@@ -42,3 +42,6 @@ class PhotoFrameContent(ABC):
 
     def get_description(self) -> str:
         pass
+
+    def refresh_media_list(self):
+        pass

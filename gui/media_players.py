@@ -37,9 +37,9 @@ class AbstractMediaPlayer(PhotoFrameContent):
         self.current_media_index = None
         self.browsing_history = []
 
-        self._refresh_media_list()
+        self.refresh_media_list()
 
-    def _refresh_media_list(self):
+    def refresh_media_list(self):
         """
         Re-load the media list from the filesystem
 
@@ -108,7 +108,7 @@ class AbstractMediaPlayer(PhotoFrameContent):
             logger.debug("Getting random photo")
             return self._move(lambda x, y: False, random_jump, random_jump)
 
-        logger.info("Moving to next photo")
+        logger.debug("Moving to next photo")
         self._move(at_end, jump_to_start, move_to_next)
 
     def prev(self):
@@ -155,7 +155,7 @@ class AbstractMediaPlayer(PhotoFrameContent):
         painter.end()
 
     def _move(self, is_boundary, jump, move):
-        self._refresh_media_list()
+        self.refresh_media_list()
 
         invalid_media = True
         ctr = 0

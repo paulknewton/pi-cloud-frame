@@ -2,19 +2,21 @@ import collections
 import logging
 import os
 import sys
+import requests
 from typing import List
 
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QFont, QImage
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtGui import QFont, QImage, QGuiApplication
 from PyQt5.QtWidgets import QDialog, QLabel, QGridLayout, QPushButton, QSplashScreen
 
 from gui.players import PhotoFrameContent
 from utils import photo_utils
 
 logger = logging.getLogger(__name__)
+
+GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/staticmap?zoom=11&size=350x350&maptype=roadmap&markers=color:red|label:C|%f,%f&key=%s"
 
 
 class PhotoFrame(QtWidgets.QMainWindow):
@@ -33,11 +35,12 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.flip_rotation = None
         self.rotation = None
         self.shuffle = None
+        self.google_maps = None
 
         self.players = None
         self.current_player_index = 0
         self.watermark = None
-        self.frame_size = 0
+        self.frame_size = QSize()
         self.splash_window = None
         self.popup = None
         self.stack = None
@@ -108,6 +111,9 @@ class PhotoFrame(QtWidgets.QMainWindow):
         self.shuffle = self.config.get_config_value("shuffle", frame_config)
         logger.info("Shuffle = %s", self.shuffle)
 
+        self.google_maps = self.config.get_config_value("google_maps", frame_config)
+        logger.info("Google Maps API = %s", self.google_maps)
+
     def _setup_players(self):
         """
         Factory method to create the set of media players
@@ -122,6 +128,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
         # iterate through each entry, creating a corresponding media player
         for name in players_config:
+            player = None
             if players_config[name]["type"] == "photo_player":
                 from gui.media_players import PhotoPlayer
                 player = PhotoPlayer(name, self.root_folder + "/" + self.config.get_config_value("folder",
@@ -283,7 +290,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
 
     def refresh_current_playlist(self):
         logger.info("Refreshing media list for %s", self.get_current_player().get_name())
-        self.get_current_player()._refresh_media_list()
+        self.get_current_player().refresh_media_list()
 
     def _popup(self):
         # only show popup for photo player
@@ -296,7 +303,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
             self.popup = Popup(self, self.font_size)
 
         filename, exif = self.get_current_player().get_current_media_exif()  # filename and EXIF may be none
-        self.popup.show_image_details(filename, exif)
+        self.popup.update_popup(filename, exif)
 
     def splash_screen(self, delay: int):
         angle_to_rotate_photo = 0
@@ -319,6 +326,7 @@ class PhotoFrame(QtWidgets.QMainWindow):
         # set timer to close the splashscreen
         def wrap_close():
             self.splash_window.close()
+
         QtCore.QTimer.singleShot(delay, wrap_close)
 
 
@@ -334,12 +342,14 @@ class Popup(QDialog):
         self.labels = ["Filename:", "Date:", "Location:"]  # static labels
         # list of QLabel widgets, each corresponding to a static label
         self.value_widgets: List[QtWidgets.QWidget] = []
+        self.map_label = None
+
         self._build_ui()
 
         # ref to current filename (used to delete files)
         self._current_filename: str = ""
 
-    def show_image_details(self, filename, exif_tags):
+    def update_popup(self, filename, exif_tags):
         """
         Display meta information about the selected photo in the popup dialog.
 
@@ -351,6 +361,8 @@ class Popup(QDialog):
         if not filename:
             filename = "<unknown>"
         self.value_widgets[0].setText(filename)
+
+        map_image = QImage("unknown_map.png")  # default image
 
         # extract EXIF data (set default values in case the information cannot be found)
         logger.debug("exif tags: %s", exif_tags)
@@ -373,21 +385,39 @@ class Popup(QDialog):
             if "GPS GPSLongitude" in exif_tags.keys():
                 long = exif_tags["GPS GPSLongitude"]
 
-            # if we have GPS data, reverse lookup address
+            # if we have GPS data...
             if all([lat, lat_ref, long, long_ref]):
                 lat_d, lat_m, lat_s = tuple(lat.values)
                 long_d, long_m, long_s = tuple(long.values)
-                location = photo_utils.get_gps_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
-                                                        lat_s.num / lat_s.den,
-                                                        lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
-                                                        long_s.num / long_s.den, long_ref)
+
+                # reverse lookup address
+                logger.debug("%s %s %s %s", lat, lat_ref, long, long_ref)
+                location = photo_utils.get_gps_dms_location(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
+                                                            lat_s.num / lat_s.den,
+                                                            lat_ref, long_d.num / long_d.den, long_m.num / long_m.den,
+                                                            long_s.num / long_s.den, long_ref)
 
                 # reformat lines
                 location = "\n".join(location.split(", "))
 
+                # download image via Google Maps API
+                latitude, longitude, _altitude = photo_utils.gps_dms_to_dd(lat_d.num / lat_d.den, lat_m.num / lat_m.den,
+                                                                           lat_s.num / lat_s.den,
+                                                                           lat_ref, long_d.num / long_d.den,
+                                                                           long_m.num / long_m.den,
+                                                                           long_s.num / long_s.den, long_ref)
+                try:
+                    map_url = GOOGLE_MAPS_URL % (latitude, longitude, self.frame.google_maps)
+                    response = requests.get(map_url)
+                    map_image.loadFromData(response.content)
+                except requests.exceptions.ConnectionError as e:
+                    logger.error("Error downloading map from Google Maps API - %s", e)
+                    map_image = QImage("unknown_map.png")
+
         self.value_widgets[1].setText(date)
         self.value_widgets[2].setText(location)
-        # self.date_label.adjustSize()
+        map_image = map_image.scaledToWidth(350, QtCore.Qt.SmoothTransformation)
+        self.map_label.setPixmap(QtGui.QPixmap.fromImage(map_image))
         self.show()
 
     def _build_ui(self):
@@ -404,7 +434,7 @@ class Popup(QDialog):
         logo_label = QLabel(self)
         logo = self.frame.logo_large.scaledToWidth(self.frame.frame_size.width() / 15, QtCore.Qt.SmoothTransformation)
         logo_label.setPixmap(QtGui.QPixmap.fromImage(logo))
-        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 2 columns
+        layout.addWidget(logo_label, 0, 0, 1, -1, QtCore.Qt.AlignCenter)  # span 3 columns
 
         # create labels and empty values
         for y, label in enumerate(self.labels):
@@ -414,6 +444,7 @@ class Popup(QDialog):
             layout.addWidget(label_widget, y + 1, 0)
 
             value_widget = QLabel(self)
+            value_widget.setAlignment(QtCore.Qt.AlignLeft)
             value_widget.setFont(font_roman)
             layout.addWidget(value_widget, y + 1, 1)
             self.value_widgets.append(value_widget)
@@ -421,7 +452,11 @@ class Popup(QDialog):
         delete_button = QPushButton("Delete photo", self)
         delete_button.clicked.connect(self.on_click)
 
-        layout.addWidget(delete_button, len(self.labels) + 1, 0, 1, -1)  # span 2 columns
+        # GPS map
+        self.map_label = QLabel(self)
+        layout.addWidget(self.map_label, 1, 2, -1, -1, QtCore.Qt.AlignCenter)  # right-hand column
+
+        layout.addWidget(delete_button, len(self.labels) + 2, 0)  # bottom left
 
     @pyqtSlot()
     def on_click(self):

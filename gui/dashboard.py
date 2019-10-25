@@ -6,7 +6,6 @@ from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QSizePolicy
 from hurry.filesize import size
 
-import utils.orientation
 from gui.photo_app import PhotoFrame
 from gui.players import PhotoFrameContent
 
@@ -46,7 +45,7 @@ class FrameDashboard(PhotoFrameContent):
         # heading.setText("<p><b>Dashboard</b>")
         # heading.setFixedWidth(self.photo_frame.frame_size.width() * 0.3)
         # heading.setSizePolicy(no_vstretch_policy)
-        #main_layout.addWidget(heading, 0, 0, 0, 1)
+        # main_layout.addWidget(heading, 0, 0, 0, 1)
 
         # machine info
         machine_group = QtWidgets.QFrame()
@@ -97,8 +96,8 @@ class FrameDashboard(PhotoFrameContent):
         player_layout.addWidget(self.player_text)
 
         # add a scrollbar
-        #scroll = QtWidgets.QScrollArea(player_group)
-        #scroll.setWidget(self.player_text)
+        # scroll = QtWidgets.QScrollArea(player_group)
+        # scroll.setWidget(self.player_text)
 
         main_layout.addWidget(player_group, 1, 0, 1, 2)
 

@@ -1,10 +1,9 @@
 import logging
 import os
 import sys
-from tqdm import tqdm
-import time
 
 from pyicloud import PyiCloudService
+from tqdm import tqdm
 
 from utils import photo_utils
 
@@ -69,7 +68,7 @@ class IcloudPhotos:
 
         media_type = IcloudPhotos._get_media_type(photo)
 
-        if (media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]):
+        if media_type not in ["public.jpeg", "public.png", "public.heic", "public.heif", "public.tiff"]:
             # if (media_type not in ["public.heic"]):
             logger.debug("[Invalid media_type %s - skip]", media_type)
             return False
