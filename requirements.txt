@@ -6,7 +6,6 @@ PyYAML>=5.1.2
 exifread>=2.1.2
 future>=0.17.1
 geopy>=1.20.0
-hurry.filesize>=0.9
 psutil>=5.6.3
 pyicloud>=0.9.1
 tqdm==4.36.1
