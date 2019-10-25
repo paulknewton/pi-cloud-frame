@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/paulknewton/pi_cloud_frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi_cloud_frame)
-[![codecov](https://codecov.io/gh/paulknewton/pi_cloud_frame/branch/master/graph/badge.svg)](https://codecov.io/gh/paulknewton/pi_cloud_frame)
-[![pyup](https://pyup.io/repos/github/paulknewton/pi_cloud_frame/shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi_cloud_frame)
-[![python3](https://pyup.io/repos/github/paulknewton/pi_cloud_frame/python-3-shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi_cloud_frame)
+[![Build Status](https://travis-ci.org/paulknewton/pi-cloud-frame.svg?branch=master)](https://travis-ci.org/paulknewton/pi-cloud-frame)
+[![codecov](https://codecov.io/gh/paulknewton/pi-cloud-frame/branch/master/graph/badge.svg)](https://codecov.io/gh/paulknewton/pi-cloud-frame)
+[![pyup](https://pyup.io/repos/github/paulknewton/pi-cloud-frame/shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi-cloud-frame)
+[![python3](https://pyup.io/repos/github/paulknewton/pi-cloud-frame/python-3-shield.svg)](https://pyup.io/account/repos/github/paulknewton/pi-cloud-frame)
 
-[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi_cloud_frame/?ref=repository-badge)
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/paulknewton/pi-cloud-frame/?ref=repository-badge)
 # pi cloud frame
 ![logo_medium](img/logo_medium.png)
 
