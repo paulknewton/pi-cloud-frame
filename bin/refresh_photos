@@ -100,9 +100,9 @@ do
     OUT_FILE=`basename "$SRC_FILE" | sed -e 's/ /_/g'`
 #    echo Cropping $OUT_FILE
     echo -ne "#"
-    echo
     aspectcrop -a "$ASPECT" "$SRC_FILE" "$OUT_FILE"
 done
+echo
 cd "$ROOT"
 
 echo "Cleaning download folder $DOWNLOAD..."
@@ -119,9 +119,9 @@ for i in "$ROOT/$CROPPED"/*
 do
 #    echo `basename "$i"`
     echo -ne "#"
-    echo
     convert "$i" `basename "$i"`.jpg
 done
+echo
 cd "$ROOT"
 
 echo "Cleaning crop folder $CROPPED..."
