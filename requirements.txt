@@ -1,4 +1,4 @@
-click==7.1.1
+click==8.1.7
 Pillow>=6.0.0
 PyQt5-sip>=4.19.18
 PyQt5>=5.13.0
